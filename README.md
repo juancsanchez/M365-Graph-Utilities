@@ -21,12 +21,12 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 
 | Script                                      | API                    | Permisos Necesarios                                        |
 | :------------------------------------------ | :--------------------- | :--------------------------------------------------------- |
-| **dt-Generar-ReporteDeUsoM365.ps1** | Microsoft Graph        | `User.Read.All`, `Files.Read.All`, `Directory.Read.All`    |
+| **sc-Generar-ReporteDeUsoM365.ps1** | Microsoft Graph        | `User.Read.All`, `Files.Read.All`, `Directory.Read.All`    |
 |                                             | Office 365 Exchange Online | `Exchange.ManageAsApp`                                     |
-| **dt-Generar-ReporteLicencias.ps1** | Microsoft Graph        | `User.Read.All`, `Directory.Read.All`, `AuditLog.Read.All` |
-| **dt-Generar-ReporteRolesAdmin.ps1** | Microsoft Graph        | `RoleManagement.Read.Directory`, `User.Read.All`           |
+| **sc-Generar-ReporteLicencias.ps1** | Microsoft Graph        | `User.Read.All`, `Directory.Read.All`, `AuditLog.Read.All` |
+| **sc-Generar-ReporteRolesAdmin.ps1** | Microsoft Graph        | `RoleManagement.Read.Directory`, `User.Read.All`           |
 
-**Nota importante**: Para el script `dt-Generar-ReporteDeUsoM365.ps1`, el Service Principal debe tener asignado un rol de administrador en Exchange Online (ej. `Global Reader` o `View-Only Organization Management`).
+**Nota importante**: Para el script `sc-Generar-ReporteDeUsoM365.ps1`, el Service Principal debe tener asignado un rol de administrador en Exchange Online (ej. `Global Reader` o `View-Only Organization Management`).
 
 ## Configuración Inicial
 
@@ -65,34 +65,34 @@ Este comando creará el archivo `secret.xml`. **Importante**: Este archivo solo 
 
 ### 4. Crear y Subir el Certificado (Para Exchange Online)
 
-El script `dt-Generar-ReporteDeUsoM365.ps1` utiliza un certificado para la autenticación en Exchange Online.
+El script `sc-Generar-ReporteDeUsoM365.ps1` utiliza un certificado para la autenticación en Exchange Online.
 
 1.  Asegúrese de que el parámetro `dnsName` en su `config.json` sea correcto.
-2.  Ejecute el script `dt-Crear-CertificadoExchangePowerShell.ps1`. Le pedirá una contraseña para proteger el archivo `.pfx` resultante.
+2.  Ejecute el script `sc-Crear-CertificadoExchangePowerShell.ps1`. Le pedirá una contraseña para proteger el archivo `.pfx` resultante.
 3.  Una vez creado, suba el archivo `.cer` a su App Registration en el portal de Microsoft Entra ID (en la sección *Certificados y secretos*).
 4.  Copie la **huella digital (Thumbprint)** del certificado y péguela en el campo `certThumbprint` de su `config.json`.
 
 ## Scripts Incluidos
 
-#### `dt-Generar-ReporteDeUsoM365.ps1`
+#### `sc-Generar-ReporteDeUsoM365.ps1`
 Genera un informe CSV que detalla el uso del almacenamiento para cada usuario, incluyendo:
 * Tamaño del buzón principal.
 * Tamaño del buzón de archivo.
 * Espacio utilizado en OneDrive.
 
-#### `dt-Generar-ReporteLicencias.ps1`
+#### `sc-Generar-ReporteLicencias.ps1`
 Audita las licencias de Microsoft 365. El informe CSV resultante incluye:
 * Nombre del usuario y UPN.
 * Licencias asignadas (con nombres comerciales, p. ej., "Microsoft 365 E5").
 * Fecha del último inicio de sesión.
 
-#### `dt-Generar-ReporteRolesAdmin.ps1`
+#### `sc-Generar-ReporteRolesAdmin.ps1`
 Crea un informe de los usuarios que son miembros de roles de administrador privilegiados (como Administrador Global, Administrador de Exchange, etc.). El informe CSV detalla:
 * Nombre del rol.
 * Nombre del miembro.
 * User Principal Name (UPN) del miembro.
 
-#### `dt-Crear-CertificadoExchangePowerShell.ps1`
+#### `sc-Crear-CertificadoExchangePowerShell.ps1`
 Script de utilidad para crear un nuevo certificado autofirmado y exportarlo a los formatos `.pfx` y `.cer`, necesarios para la autenticación basada en certificados con Exchange Online.
 
 ## Cómo Ejecutar un Script
@@ -104,7 +104,7 @@ Después de completar la configuración inicial:
 3.  Ejecute el script deseado. Por ejemplo:
 
 ```powershell
-.\dt-Generar-ReporteLicencias.ps1
+.\sc-Generar-ReporteLicencias.ps1
 ```
 
 El script se conectará a los servicios necesarios, recopilará los datos y generará un archivo CSV con los resultados en la misma carpeta.
