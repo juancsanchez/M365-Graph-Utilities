@@ -4,9 +4,9 @@ Este repositorio contiene una colección de scripts de PowerShell diseñados par
 
 ## Características
 
-* **Autenticación Desatendida**: Conexión segura a Microsoft Graph y Exchange Online mediante un principal de servicio (App Registration).
+* **Autenticación Desatendida**: Conexión segura a Microsoft Graph y Exchange Online mediante un principal de servicio (App Registration), utilizando tanto secretos de cliente como certificados.
 * **Configuración Externalizada**: Los parámetros sensibles como IDs de tenant y cliente se gestionan en un archivo `config.json` para no exponerlos en el código.
-* **Manejo Seguro de Secretos**: El secreto del cliente se almacena de forma segura en un archivo XML encriptado, que solo puede ser utilizado por el usuario que lo creó en el mismo equipo.
+* **Manejo Seguro de Secretos**: Para los scripts que lo requieren, el secreto del cliente se almacena de forma segura en un archivo XML encriptado, que solo puede ser utilizado por el usuario que lo creó en el mismo equipo.
 * **Generación de Informes**: Exporta los datos recopilados a archivos CSV para fácil análisis y auditoría.
 * **Instalación Automática de Módulos**: Los scripts verifican e intentan instalar los módulos de PowerShell requeridos (`Microsoft.Graph`, `ExchangeOnlineManagement`) si no están presentes.
 
@@ -19,12 +19,13 @@ Este repositorio contiene una colección de scripts de PowerShell diseñados par
 
 Asegúrese de que el *Service Principal* de su App Registration tenga los siguientes permisos de API (tipo `Aplicación`) consentidos:
 
-| Script                                      | API                    | Permisos Necesarios                                        |
-| :------------------------------------------ | :--------------------- | :--------------------------------------------------------- |
-| **sc-Generar-ReporteDeUsoM365.ps1** | Microsoft Graph        | `User.Read.All`, `Files.Read.All`, `Directory.Read.All`    |
-|                                             | Office 365 Exchange Online | `Exchange.ManageAsApp`                                     |
-| **sc-Generar-ReporteLicencias.ps1** | Microsoft Graph        | `User.Read.All`, `Directory.Read.All`, `AuditLog.Read.All` |
-| **sc-Generar-ReporteRolesAdmin.ps1** | Microsoft Graph        | `RoleManagement.Read.Directory`, `User.Read.All`           |
+| Script | API | Permisos Necesarios |
+| :--- | :--- | :--- |
+| **sc-Generar-ReporteDeUsoM365.ps1** | Microsoft Graph | `User.Read.All`, `Files.Read.All`, `Directory.Read.All` |
+| | Office 365 Exchange Online | `Exchange.ManageAsApp` |
+| **sc-Generar-ReporteLicencias.ps1** | Microsoft Graph | `User.Read.All`, `Directory.Read.All`, `AuditLog.Read.All` |
+| **sc-Generar-ReporteRolesAdmin.ps1** | Microsoft Graph | `RoleManagement.Read.Directory`, `User.Read.All` |
+| **sc-Generar-ReporteServicePrincipals.ps1**| Microsoft Graph | `Application.Read.All`, `AppRoleAssignment.ReadWrite.All`, `Directory.Read.All` |
 
 **Nota importante**: Para el script `sc-Generar-ReporteDeUsoM365.ps1`, el Service Principal debe tener asignado un rol de administrador en Exchange Online (ej. `Global Reader` o `View-Only Organization Management`).
 
@@ -48,24 +49,24 @@ Cree un archivo llamado `config.json` en la raíz del directorio. Este archivo c
   "tenantId": "SU_ID_DE_TENANT_AQUI",
   "clientId": "SU_ID_DE_CLIENTE_(APLICACION)_AQUI",
   "organizationName": "SU_ORGANIZACION.onmicrosoft.com",
-  "certThumbprint": "HUELLA_DEL_CERTIFICADO_PARA_EXCHANGE",
+  "certThumbprint": "HUELLA_DEL_CERTIFICADO_AQUI",
   "dnsName": "su.dominio.com"
 }
 ```
-*Nota: `certThumbprint` y `dnsName` solo son requeridos por los scripts que se conectan a Exchange Online.*
+*Nota: `certThumbprint`, `organizationName` y `dnsName` solo son requeridos por los scripts que se conectan usando un certificado (a Exchange Online o a Microsoft Graph).*
 
-### 3. Crear el Secreto Encriptado
+### 3. Crear el Secreto Encriptado (Si es necesario)
 
-Para evitar almacenar el secreto del cliente en texto plano, los scripts utilizan un archivo `secret.xml` encriptado. Para crearlo, abra una terminal de PowerShell y ejecute el siguiente comando, reemplazando `"SU_SECRETO_AQUI"` con el secreto real de su App Registration.
+Algunos scripts utilizan un archivo `secret.xml` encriptado para la autenticación con Microsoft Graph. Para crearlo, abra una terminal de PowerShell y ejecute el siguiente comando, reemplazando `"SU_SECRETO_AQUI"` con el secreto real de su App Registration.
 
 ```powershell
 "SU_SECRETO_AQUI" | ConvertTo-SecureString -AsPlainText -Force | Export-CliXml -Path ".\secret.xml"
 ```
-Este comando creará el archivo `secret.xml`. **Importante**: Este archivo solo puede ser desencriptado por el mismo usuario y en el mismo equipo donde fue creado.
+**Importante**: Este archivo solo puede ser desencriptado por el mismo usuario y en el mismo equipo donde fue creado.
 
-### 4. Crear y Subir el Certificado (Para Exchange Online)
+### 4. Crear y Subir el Certificado (Si es necesario)
 
-El script `sc-Generar-ReporteDeUsoM365.ps1` utiliza un certificado para la autenticación en Exchange Online.
+Los scripts que se conectan a Exchange Online o los que usan autenticación por certificado para Graph requieren un certificado.
 
 1.  Asegúrese de que el parámetro `dnsName` en su `config.json` sea correcto.
 2.  Ejecute el script `sc-Crear-CertificadoExchangePowerShell.ps1`. Le pedirá una contraseña para proteger el archivo `.pfx` resultante.
@@ -75,25 +76,23 @@ El script `sc-Generar-ReporteDeUsoM365.ps1` utiliza un certificado para la auten
 ## Scripts Incluidos
 
 #### `sc-Generar-ReporteDeUsoM365.ps1`
-Genera un informe CSV que detalla el uso del almacenamiento para cada usuario, incluyendo:
-* Tamaño del buzón principal.
-* Tamaño del buzón de archivo.
-* Espacio utilizado en OneDrive.
+Genera un informe CSV que detalla el uso del almacenamiento para cada usuario, incluyendo el tamaño del buzón principal, del buzón de archivo y el espacio utilizado en OneDrive.
+*(Método de autenticación: Secreto para Graph, Certificado para Exchange Online)*
 
 #### `sc-Generar-ReporteLicencias.ps1`
-Audita las licencias de Microsoft 365. El informe CSV resultante incluye:
-* Nombre del usuario y UPN.
-* Licencias asignadas (con nombres comerciales, p. ej., "Microsoft 365 E5").
-* Fecha del último inicio de sesión.
+Audita las licencias de Microsoft 365. El informe CSV resultante incluye el nombre del usuario, UPN, licencias asignadas (con nombres comerciales) y su fecha del último inicio de sesión.
+*(Método de autenticación: Secreto para Graph)*
 
 #### `sc-Generar-ReporteRolesAdmin.ps1`
-Crea un informe de los usuarios que son miembros de roles de administrador privilegiados (como Administrador Global, Administrador de Exchange, etc.). El informe CSV detalla:
-* Nombre del rol.
-* Nombre del miembro.
-* User Principal Name (UPN) del miembro.
+Crea un informe de los usuarios que son miembros de roles de administrador privilegiados. El informe CSV detalla el nombre del rol y los datos del miembro.
+*(Método de autenticación: Secreto para Graph)*
+
+#### `sc-Generar-ReporteServicePrincipals.ps1`
+Realiza una auditoría de los permisos de API asignados a todos los Service Principals en el tenant, clasificándolos y destacando aquellos con privilegios elevados.
+*(Método de autenticación: Certificado para Graph)*
 
 #### `sc-Crear-CertificadoExchangePowerShell.ps1`
-Script de utilidad para crear un nuevo certificado autofirmado y exportarlo a los formatos `.pfx` y `.cer`, necesarios para la autenticación basada en certificados con Exchange Online.
+Script de utilidad para crear un nuevo certificado autofirmado y exportarlo a los formatos `.pfx` y `.cer`, necesarios para la autenticación basada en certificados.
 
 ## Cómo Ejecutar un Script
 
@@ -115,5 +114,4 @@ Juan Sánchez
 
 ## Descargo de Responsabilidad
 
-Estos scripts se proporcionan "tal cual", sin garantía de ningún tipo. Úselos bajo su propio riesgo. Siempre es recomendable probarlos primero en un entorno de desarrollo o de prueba.
-Fueron probados y validados en entornos de prueba y producción.
+Estos scripts se proporcionan "tal cual", sin garantía de ningún tipo. Úselos bajo su propio riesgo. Siempre es recomendable probarlos primero en un entorno de desarrollo o de prueba. Fueron probados y validados en entornos de prueba y producción.
