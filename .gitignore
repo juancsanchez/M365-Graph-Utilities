@@ -1,0 +1,13 @@
+# Exclude packaged modules
+*.zip
+
+# Exclude .NET assemblies from source
+*.dll
+
+# Exclude certs
+*.cer
+*.pfx
+
+# Exclude Config
+secret.xml
+config.json
