@@ -10,4 +10,8 @@
 
 # Exclude Config
 secret.xml
-config.json
+*.json
+
+# Output files
+*.csv
+*.xlsx
