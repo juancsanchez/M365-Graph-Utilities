@@ -116,3 +116,4 @@ Juan Sánchez
 ## Descargo de Responsabilidad
 
 Estos scripts se proporcionan "tal cual", sin garantía de ningún tipo. Úselos bajo su propio riesgo. Siempre es recomendable probarlos primero en un entorno de desarrollo o de prueba.
+Fueron probados y validados en entornos de prueba y producción.
