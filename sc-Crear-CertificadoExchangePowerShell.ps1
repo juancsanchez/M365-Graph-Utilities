@@ -11,6 +11,7 @@ if (-not (Test-Path $configFilePath)) {
 try {
     $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
     $dnsName = $config.dnsName
+    $tenant = $config.tenant
 }
 catch {
     Write-Error "No se pudo leer o procesar el archivo de configuración '$configFilePath'. Verifique que el formato JSON sea correcto."
@@ -24,7 +25,7 @@ $mycert = New-SelfSignedCertificate -DnsName $dnsName -CertStoreLocation "cert:\
 
 # Export certificate to .pfx file
 # Optional step if you need to export the certificate with a password (for MacOS or other systems)
-$mycert | Export-PfxCertificate -FilePath "myCert-$(Get-Date -Format 'yyyy-MM-dd').pfx" -Password (Get-Credential).password
+$mycert | Export-PfxCertificate -FilePath "cert-$($tenant)-$(Get-Date -Format 'yyyy-MM-dd').pfx" -Password (Get-Credential).password
 
 # Export certificate to .cer file with current date in the name
-$mycert | Export-Certificate -FilePath "myCert-$(Get-Date -Format 'yyyy-MM-dd').cer"
+$mycert | Export-Certificate -FilePath "cert-$($tenant)-$(Get-Date -Format 'yyyy-MM-dd').cer"
