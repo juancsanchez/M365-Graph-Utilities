@@ -23,9 +23,8 @@ catch {
 $mycert = New-SelfSignedCertificate -DnsName $dnsName -CertStoreLocation "cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(2) -KeySpec KeyExchange
 
 # Export certificate to .pfx file
-# Optional step if you need to export the certificate with a password
-# Uncomment the next line to export the certificate to a .pfx file with a password
-# $mycert | Export-PfxCertificate -FilePath "myCert-$(Get-Date -Format 'yyyy-MM-dd').pfx" -Password (Get-Credential).password
+# Optional step if you need to export the certificate with a password (for MacOS or other systems)
+$mycert | Export-PfxCertificate -FilePath "myCert-$(Get-Date -Format 'yyyy-MM-dd').pfx" -Password (Get-Credential).password
 
 # Export certificate to .cer file with current date in the name
 $mycert | Export-Certificate -FilePath "myCert-$(Get-Date -Format 'yyyy-MM-dd').cer"
