@@ -60,8 +60,9 @@ catch {
 # Paso 2: Conectarse a Microsoft Graph utilizando las credenciales de la aplicación.
 try {
     Write-Host "Conectando a Microsoft Graph con credenciales de aplicación..." -ForegroundColor Cyan
-    $credential = New-Object System.Management.Automation.PSCredential($clientId, $secureSecret)
-    Connect-MgGraph -TenantId $tenantId -Credential $credential
+    # $credential = New-Object System.Management.Automation.PSCredential($clientId, $secureSecret)
+    # Connect-MgGraph -TenantId $tenantId -Credential $credential
+    Connect-MgGraph -TenantId $TenantId -AppId $ClientId -CertificateThumbprint $certThumbprint
     Write-Host "Conexión exitosa." -ForegroundColor Green
 }
 catch {

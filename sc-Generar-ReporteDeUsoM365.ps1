@@ -101,8 +101,9 @@ catch {
 # --- Conexión a Servicios ---
 try {
     Write-Host "Conectando a Microsoft Graph..." -ForegroundColor Cyan
-    $credential = New-Object System.Management.Automation.PSCredential($clientId, $secureSecret)
-    Connect-MgGraph -TenantId $tenantId -Credential $credential
+    # $credential = New-Object System.Management.Automation.PSCredential($clientId, $secureSecret)
+    # Connect-MgGraph -TenantId $tenantId -Credential $credential
+    Connect-MgGraph -TenantId $TenantId -AppId $ClientId -CertificateThumbprint $certThumbprint
     Write-Host "Conexión a Microsoft Graph exitosa." -ForegroundColor Green
 
     Write-Host "Conectando a Exchange Online con certificado..." -ForegroundColor Cyan
