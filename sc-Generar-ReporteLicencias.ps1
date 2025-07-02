@@ -136,6 +136,8 @@ $skuFriendlyNames = @{
     "POWERAPPS_VIRAL" = "Microsoft Power Apps Plan 2 Trial";
     "FORMS_PRO" = "Dynamics 365 Customer Voice Trial";
     "O365_BUSINESS_PREMIUM" = "Microsoft 365 Business Premium";
+    "O365_BUSINESS_ESSENTIALS" = "Microsoft 365 Business Basic";
+    "O365_BUSINESS" = "Microsoft 365 Business Standard";
     # Agregue aquí otras licencias que su organización utilice
 }
 
