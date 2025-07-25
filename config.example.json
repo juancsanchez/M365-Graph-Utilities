@@ -1,0 +1,7 @@
+{
+  "tenantId": "00000000-0000-0000-0000-000000000000",
+  "clientId": "11111111-1111-1111-1111-111111111111",
+  "organizationName": "suorganizacion.onmicrosoft.com",
+  "certThumbprint": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1B2",
+  "dnsName": "automatizacion.sudominio.com"
+}

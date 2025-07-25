@@ -10,7 +10,7 @@
 
 # Exclude Config
 secret.xml
-*.json
+config.json
 
 # Output files
 *.csv

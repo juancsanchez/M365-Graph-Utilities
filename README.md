@@ -4,16 +4,16 @@ Este repositorio contiene una colección de scripts de PowerShell diseñados par
 
 ## Características
 
-* **Autenticación Desatendida**: Conexión segura a Microsoft Graph y Exchange Online mediante un principal de servicio (App Registration), utilizando tanto secretos de cliente como certificados.
-* **Configuración Externalizada**: Los parámetros sensibles como IDs de tenant y cliente se gestionan en un archivo `config.json` para no exponerlos en el código.
-* **Manejo Seguro de Secretos**: Para los scripts que lo requieren, el secreto del cliente se almacena de forma segura en un archivo XML encriptado, que solo puede ser utilizado por el usuario que lo creó en el mismo equipo.
-* **Generación de Informes**: Exporta los datos recopilados a archivos CSV para fácil análisis y auditoría.
-* **Instalación Automática de Módulos**: Los scripts verifican e intentan instalar los módulos de PowerShell requeridos (`Microsoft.Graph`, `ExchangeOnlineManagement`) si no están presentes.
+  * **Autenticación Desatendida**: Conexión segura a Microsoft Graph y Exchange Online mediante un principal de servicio (App Registration), utilizando tanto secretos de cliente como certificados.
+  * **Configuración Externalizada**: Los parámetros sensibles como IDs de tenant y cliente se gestionan en un archivo `config.json` para no exponerlos en el código.
+  * **Manejo Seguro de Secretos**: Para los scripts que lo requieren, el secreto del cliente se almacena de forma segura en un archivo XML encriptado, que solo puede ser utilizado por el usuario que lo creó en el mismo equipo.
+  * **Generación de Informes**: Exporta los datos recopilados a archivos CSV para fácil análisis y auditoría.
+  * **Instalación Automática de Módulos**: Los scripts verifican e intentan instalar los módulos de PowerShell requeridos (`Microsoft.Graph`, `ExchangeOnlineManagement`) si no están presentes.
 
 ## Prerrequisitos
 
-* **PowerShell**: Versión 5.1 o superior.
-* **App Registration en Microsoft Entra ID**: Se necesita una aplicación registrada en el tenant con los permisos de API correspondientes consentidos por un administrador.
+  * **PowerShell**: Versión 5.1 o superior. Se recomienda la 7+ para scripts que usan `-Parallel`.
+  * **App Registration en Microsoft Entra ID**: Se necesita una aplicación registrada en el tenant con los permisos de API correspondientes consentidos por un administrador.
 
 ## Permisos de API Requeridos
 
@@ -21,6 +21,8 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 
 | Script | API | Permisos Necesarios |
 | :--- | :--- | :--- |
+| **sc-Generar-CuentaUsuariosLicenciados.ps1** | Microsoft Graph | `User.Read.All` |
+| **sc-Encontrar-GruposComunesUsuarios.ps1** | Microsoft Graph | `User.Read.All`, `Group.Read.All`, `Directory.Read.All` |
 | **sc-Generar-ReporteDeUsoM365.ps1** | Microsoft Graph | `User.Read.All`, `Files.Read.All`, `Directory.Read.All` |
 | | Office 365 Exchange Online | `Exchange.ManageAsApp` |
 | **sc-Generar-ReporteLicencias.ps1** | Microsoft Graph | `User.Read.All`, `Directory.Read.All`, `AuditLog.Read.All` |
@@ -33,14 +35,14 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 
 Siga estos pasos para configurar su entorno antes de ejecutar los scripts.
 
-### 1. Clonar el Repositorio
+### 1\. Clonar el Repositorio
 
 ```bash
 git clone <URL_DEL_REPOSITORIO>
 cd <NOMBRE_CARPETA_REPOSITORIO>
 ```
 
-### 2. Crear el Archivo de Configuración
+### 2\. Crear el Archivo de Configuración
 
 Cree un archivo llamado `config.json` en la raíz del directorio. Este archivo contendrá los parámetros de conexión. Copie la siguiente plantilla y rellene sus valores.
 
@@ -53,18 +55,20 @@ Cree un archivo llamado `config.json` en la raíz del directorio. Este archivo c
   "dnsName": "su.dominio.com"
 }
 ```
+
 *Nota: `certThumbprint`, `organizationName` y `dnsName` solo son requeridos por los scripts que se conectan usando un certificado (a Exchange Online o a Microsoft Graph).*
 
-### 3. Crear el Secreto Encriptado (Si es necesario)
+### 3\. Crear el Secreto Encriptado (Si es necesario)
 
 Algunos scripts utilizan un archivo `secret.xml` encriptado para la autenticación con Microsoft Graph. Para crearlo, abra una terminal de PowerShell y ejecute el siguiente comando, reemplazando `"SU_SECRETO_AQUI"` con el secreto real de su App Registration.
 
 ```powershell
 "SU_SECRETO_AQUI" | ConvertTo-SecureString -AsPlainText -Force | Export-CliXml -Path ".\secret.xml"
 ```
+
 **Importante**: Este archivo solo puede ser desencriptado por el mismo usuario y en el mismo equipo donde fue creado.
 
-### 4. Crear y Subir el Certificado (Si es necesario)
+### 4\. Crear y Subir el Certificado (Si es necesario)
 
 Los scripts que se conectan a Exchange Online o los que usan autenticación por certificado para Graph requieren un certificado.
 
@@ -75,23 +79,38 @@ Los scripts que se conectan a Exchange Online o los que usan autenticación por 
 
 ## Scripts Incluidos
 
+#### `sc-Generar-CuentaUsuariosLicenciados.ps1`
+
+Obtiene el recuento total de usuarios con al menos una licencia de Microsoft 365 asignada, utilizando procesamiento en paralelo para optimizar la consulta en tenants muy grandes.
+*(Método de autenticación: Certificado para Graph)*
+
+#### `sc-Encontrar-GruposComunesUsuarios.ps1`
+
+Busca grupos de seguridad y de Microsoft 365 compartidos entre un listado de 3 a 5 usuarios.
+*(Método de autenticación: Certificado para Graph)*
+
 #### `sc-Generar-ReporteDeUsoM365.ps1`
+
 Genera un informe CSV que detalla el uso del almacenamiento para cada usuario, incluyendo el tamaño del buzón principal, del buzón de archivo y el espacio utilizado en OneDrive.
-*(Método de autenticación: Secreto para Graph, Certificado para Exchange Online)*
+*(Método de autenticación: Certificado para Graph y Exchange Online)*
 
 #### `sc-Generar-ReporteLicencias.ps1`
+
 Audita las licencias de Microsoft 365. El informe CSV resultante incluye el nombre del usuario, UPN, licencias asignadas (con nombres comerciales) y su fecha del último inicio de sesión.
 *(Método de autenticación: Secreto para Graph)*
 
 #### `sc-Generar-ReporteRolesAdmin.ps1`
+
 Crea un informe de los usuarios que son miembros de roles de administrador privilegiados. El informe CSV detalla el nombre del rol y los datos del miembro.
 *(Método de autenticación: Secreto para Graph)*
 
 #### `sc-Generar-ReporteServicePrincipals.ps1`
+
 Realiza una auditoría de los permisos de API asignados a todos los Service Principals en el tenant, clasificándolos y destacando aquellos con privilegios elevados.
 *(Método de autenticación: Certificado para Graph)*
 
 #### `sc-Crear-CertificadoExchangePowerShell.ps1`
+
 Script de utilidad para crear un nuevo certificado autofirmado y exportarlo a los formatos `.pfx` y `.cer`, necesarios para la autenticación basada en certificados.
 
 ## Cómo Ejecutar un Script
@@ -101,6 +120,8 @@ Después de completar la configuración inicial:
 1.  Abra una terminal de PowerShell.
 2.  Navegue a la carpeta del repositorio.
 3.  Ejecute el script deseado. Por ejemplo:
+
+<!-- end list -->
 
 ```powershell
 .\sc-Generar-ReporteLicencias.ps1
