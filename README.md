@@ -23,6 +23,7 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 | :--- | :--- | :--- |
 | **sc-Generar-CuentaUsuariosLicenciados.ps1** | Microsoft Graph | `User.Read.All` |
 | **sc-Encontrar-GruposComunesUsuarios.ps1** | Microsoft Graph | `User.Read.All`, `Group.Read.All`, `Directory.Read.All` |
+| **sc-Agregar-OwnerGrupos.ps1** | Microsoft Graph | `GroupMember.ReadWrite.All`, `User.Read.All`, `Application.Read.All` |
 | **sc-Generar-ReporteDeUsoM365.ps1** | Microsoft Graph | `User.Read.All`, `Files.Read.All`, `Directory.Read.All` |
 | | Office 365 Exchange Online | `Exchange.ManageAsApp` |
 | **sc-Generar-ReporteLicencias.ps1** | Microsoft Graph | `User.Read.All`, `Directory.Read.All`, `AuditLog.Read.All` |
@@ -78,6 +79,11 @@ Los scripts que se conectan a Exchange Online o los que usan autenticación por 
 4.  Copie la **huella digital (Thumbprint)** del certificado y péguela en el campo `certThumbprint` de su `config.json`.
 
 ## Scripts Incluidos
+
+#### `sc-Agregar-OwnerGrupos.ps1`
+
+Agrega un principal (usuario por UPN o Service Principal por App ID) como propietario a una lista de grupos cargada desde un archivo Excel. Genera un reporte detallado de la operación.
+*(Método de autenticación: Certificado para Graph)*
 
 #### `sc-Generar-CuentaUsuariosLicenciados.ps1`
 
