@@ -29,6 +29,7 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 | **sc-Generar-ReporteLicencias.ps1** | Microsoft Graph | `User.Read.All`, `Directory.Read.All`, `AuditLog.Read.All` |
 | **sc-Generar-ReporteRolesAdmin.ps1** | Microsoft Graph | `RoleManagement.Read.Directory`, `User.Read.All` |
 | **sc-Generar-ReporteServicePrincipals.ps1**| Microsoft Graph | `Application.Read.All`, `AppRoleAssignment.ReadWrite.All`, `Directory.Read.All` |
+| **sc-Asignar-PermisosGraph-ManagedIdentity.ps1**| Microsoft Graph | `AppRoleAssignment.ReadWrite.All` |
 
 **Nota importante**: Para el script `sc-Generar-ReporteDeUsoM365.ps1`, el Service Principal debe tener asignado un rol de administrador en Exchange Online (ej. `Global Reader` o `View-Only Organization Management`).
 
@@ -83,6 +84,11 @@ Los scripts que se conectan a Exchange Online o los que usan autenticación por 
 #### `sc-Agregar-OwnerGrupos.ps1`
 
 Agrega un principal (usuario por UPN o Service Principal por App ID) como propietario a una lista de grupos cargada desde un archivo Excel. Genera un reporte detallado de la operación.
+*(Método de autenticación: Certificado para Graph)*
+
+#### `sc-Asignar-PermisosGraph-ManagedIdentity.ps1`
+
+Asigna un conjunto predefinido de permisos de Microsoft Graph a una Identidad Administrada (Managed Identity) a partir de su App ID.
 *(Método de autenticación: Certificado para Graph)*
 
 #### `sc-Generar-CuentaUsuariosLicenciados.ps1`
