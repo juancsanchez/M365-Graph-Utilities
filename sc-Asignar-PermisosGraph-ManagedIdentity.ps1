@@ -79,7 +79,9 @@ try {
     $permissionsToAssign = @(
         "AuditLog.Read.All",
         "User.Read.All",
-        "User.ReadWrite.All"
+        "User.ReadWrite.All",
+        "GroupMember.Read.All",
+        "Group.Read.All"
     )
 
     # 2. Obtener el Service Principal de la Managed Identity
