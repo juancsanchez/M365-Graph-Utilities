@@ -12,7 +12,7 @@ Este repositorio contiene una colección de scripts de PowerShell diseñados par
 
 ## Prerrequisitos
 
-  * **PowerShell**: Versión 5.1 o superior. Se recomienda la 7+ para scripts que usan `-Parallel`.
+  * **PowerShell**: Versión 5.1 o superior. Se recomienda la 7+ для scripts que usan `-Parallel`.
   * **App Registration en Microsoft Entra ID**: Se necesita una aplicación registrada en el tenant con los permisos de API correspondientes consentidos por un administrador.
 
 ## Permisos de API Requeridos
@@ -21,6 +21,7 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 
 | Script | API | Permisos Necesarios |
 | :--- | :--- | :--- |
+| **sc-Generate-EnterpriseAppsReport.ps1** | Microsoft Graph | `Application.Read.All` |
 | **sc-Generar-CuentaUsuariosLicenciados.ps1** | Microsoft Graph | `User.Read.All` |
 | **sc-Encontrar-GruposComunesUsuarios.ps1** | Microsoft Graph | `User.Read.All`, `Group.Read.All`, `Directory.Read.All` |
 | **sc-Agregar-OwnerGrupos.ps1** | Microsoft Graph | `GroupMember.ReadWrite.All`, `User.Read.All`, `Application.Read.All` |
@@ -80,6 +81,11 @@ Los scripts que se conectan a Exchange Online o los que usan autenticación por 
 4.  Copie la **huella digital (Thumbprint)** del certificado y péguela en el campo `certThumbprint` de su `config.json`.
 
 ## Scripts Incluidos
+
+#### `sc-Generate-EnterpriseAppsReport.ps1`
+
+Genera un informe de auditoría detallado de todas las Aplicaciones Empresariales (Enterprise Apps). El reporte en CSV incluye el estado de la app, si requiere asignación, el tipo de SSO y el conteo de usuarios y grupos asignados.
+*(Método de autenticación: Certificado para Graph)*
 
 #### `sc-Agregar-OwnerGrupos.ps1`
 
