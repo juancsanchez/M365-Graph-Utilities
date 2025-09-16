@@ -4,7 +4,7 @@ Este repositorio contiene una colección de scripts de PowerShell diseñados par
 
 ## Características
 
-  * **Autenticación Desatendida**: Conexión segura a Microsoft Graph y Exchange Online mediante un principal de servicio (App Registration), utilizando tanto secretos de cliente como certificados.
+  * **Autenticación Desatendida**: Conexión segura a Microsoft Graph y Exchange Online mediante un Service Principal (App Registration), utilizando tanto secretos de cliente como certificados.
   * **Configuración Externalizada**: Los parámetros sensibles como IDs de tenant y cliente se gestionan en un archivo `config.json` para no exponerlos en el código.
   * **Manejo Seguro de Secretos**: Para los scripts que lo requieren, el secreto del cliente se almacena de forma segura en un archivo XML encriptado, que solo puede ser utilizado por el usuario que lo creó en el mismo equipo.
   * **Generación de Informes**: Exporta los datos recopilados a archivos CSV para fácil análisis y auditoría.
@@ -12,7 +12,7 @@ Este repositorio contiene una colección de scripts de PowerShell diseñados par
 
 ## Prerrequisitos
 
-  * **PowerShell**: Versión 5.1 o superior. Se recomienda la 7+ для scripts que usan `-Parallel`.
+  * **PowerShell**: Versión 5.1 o superior. Se recomienda la 7+ para scripts que usan `-Parallel`.
   * **App Registration en Microsoft Entra ID**: Se necesita una aplicación registrada en el tenant con los permisos de API correspondientes consentidos por un administrador.
 
 ## Permisos de API Requeridos
@@ -21,7 +21,7 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 
 | Script | API | Permisos Necesarios |
 | :--- | :--- | :--- |
-| **sc-Generate-EnterpriseAppsReport.ps1** | Microsoft Graph | `Application.Read.All` |
+| **sc-Generar-ReporteEnterpriseApps.ps1** | Microsoft Graph | `Application.Read.All`, `Directory.Read.All`, `DelegatedPermissionGrant.Read.All` |
 | **sc-Generar-CuentaUsuariosLicenciados.ps1** | Microsoft Graph | `User.Read.All` |
 | **sc-Encontrar-GruposComunesUsuarios.ps1** | Microsoft Graph | `User.Read.All`, `Group.Read.All`, `Directory.Read.All` |
 | **sc-Agregar-OwnerGrupos.ps1** | Microsoft Graph | `GroupMember.ReadWrite.All`, `User.Read.All`, `Application.Read.All` |
@@ -38,12 +38,12 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 
 Siga estos pasos para configurar su entorno antes de ejecutar los scripts.
 
-### 1\. Clonar el Repositorio
+### 1. Clonar el Repositorio
 
 ```bash
 git clone <URL_DEL_REPOSITORIO>
 cd <NOMBRE_CARPETA_REPOSITORIO>
-```
+````
 
 ### 2\. Crear el Archivo de Configuración
 
@@ -82,9 +82,9 @@ Los scripts que se conectan a Exchange Online o los que usan autenticación por 
 
 ## Scripts Incluidos
 
-#### `sc-Generate-EnterpriseAppsReport.ps1`
+#### `sc-Generar-ReporteEnterpriseApps.ps1`
 
-Genera un informe de auditoría detallado de todas las Aplicaciones Empresariales (Enterprise Apps). El reporte en CSV incluye el estado de la app, si requiere asignación, el tipo de SSO y el conteo de usuarios y grupos asignados.
+Genera un informe de auditoría unificado de todas las Aplicaciones Empresariales, incluyendo los tipos 'Application' y 'Legacy'. El reporte en CSV incluye una columna `App_Type` para diferenciarlas, el estado, si requiere asignación, el tipo de SSO y el conteo de usuarios/grupos asignados (estos últimos campos solo para las de tipo 'Application').
 *(Método de autenticación: Certificado para Graph)*
 
 #### `sc-Agregar-OwnerGrupos.ps1`
