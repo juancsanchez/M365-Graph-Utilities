@@ -38,25 +38,61 @@
 # --- INICIO DE CONFIGURACIÓN ---
 
 # Lista editable de permisos considerados de alto privilegio. Puede agregar o quitar permisos según sus políticas de seguridad.
+# --- INICIO DE CONFIGURACIÓN ---
+
+# Lista editable de permisos considerados de alto privilegio. Puede agregar o quitar permisos según sus políticas de seguridad.
 $HighPrivilegePermissions = @(
+    # Permisos de Directorio y Roles
     "Directory.ReadWrite.All",
     "RoleManagement.ReadWrite.Directory",
+    "RoleManagement.Read.Directory",
+    
+    # Permisos de Aplicaciones y SPs
     "Application.ReadWrite.All",
     "AppRoleAssignment.ReadWrite.All",
+    
+    # Permisos de Políticas
     "Policy.ReadWrite.All",
+    
+    # Permisos de Usuarios y Grupos
     "User.ReadWrite.All",
     "Group.ReadWrite.All",
-    "Mail.ReadWrite",
-    "Mail.Send",
-    "Sites.FullControl.All",
-    "Files.ReadWrite.All",
-    "Calendars.ReadWrite",
-    "Sites.ReadWrite.All",
+
+    # Permisos de Exchange (Legacy y Nuevos)
+    "Exchange.ManageAsApp",
     "full_access_as_app",
-    "AppRoleAssignment.ReadWrite.All",
-    "RoleManagement.Read.Directory",
-    "Exchange.ManageAsApp"
+
+    # Permisos de SharePoint y OneDrive
+    "Sites.FullControl.All",
+    "Sites.ReadWrite.All",
+    "Files.ReadWrite.All",
+    
+    # Permisos de Calendarios
+    "Calendars.ReadWrite",
+
+    # --- PERMISOS DE CORREO AGREGADOS ---
+    # Lectura y Escritura de Correo
+    "Mail.Read",
+    "Mail.ReadWrite",
+    "Mail.Read.Shared",
+    "Mail.ReadWrite.Shared",
+    "Mail.ReadBasic",
+    
+    # Envío de Correo
+    "Mail.Send",
+    "Mail.Send.Shared",
+    "SMTP.Send",
+
+    # Acceso por Protocolos
+    "IMAP.AccessAsApp",
+    "POP.AccessAsApp",
+
+    # Configuración de Buzón
+    "MailboxSettings.Read",
+    "MailboxSettings.ReadWrite"
 )
+
+# --- FIN DE CONFIGURACIÓN ---
 
 # --- FIN DE CONFIGURACIÓN ---
 
