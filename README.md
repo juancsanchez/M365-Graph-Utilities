@@ -27,6 +27,7 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 | **sc-Agregar-OwnerGrupos.ps1** | Microsoft Graph | `GroupMember.ReadWrite.All`, `User.Read.All`, `Application.Read.All` |
 | **sc-Generar-ReporteDeUsoM365.ps1** | Microsoft Graph | `User.Read.All`, `Files.Read.All`, `Directory.Read.All` |
 | | Office 365 Exchange Online | `Exchange.ManageAsApp` |
+| **sc-Generar-ReporteLicenciasGrupos.ps1** | Microsoft Graph | `Group.Read.All`, `Directory.Read.All`, `GroupMember.Read.All` |
 | **sc-Generar-ReporteLicencias.ps1** | Microsoft Graph | `User.Read.All`, `Directory.Read.All`, `AuditLog.Read.All` |
 | **sc-Generar-ReporteRolesAdmin.ps1** | Microsoft Graph | `RoleManagement.Read.Directory`, `User.Read.All` |
 | **sc-Generar-ReportePermisosServicePrincipals.ps1**| Microsoft Graph | `Application.Read.All`, `AppRoleAssignment.ReadWrite.All`, `Directory.Read.All` |
@@ -111,6 +112,11 @@ Busca grupos de seguridad y de Microsoft 365 compartidos entre un listado de 3 a
 
 Genera un informe CSV que detalla el uso del almacenamiento para cada usuario, incluyendo el tamaño del buzón principal, del buzón de archivo y el espacio utilizado en OneDrive.
 *(Método de autenticación: Certificado para Graph y Exchange Online)*
+
+#### `sc-Generar-ReporteLicenciasGrupos.ps1`
+
+Genera un informe de las licencias asignadas a grupos (Group-Based Licensing) y los servicios deshabilitados en cada una, incluyendo el recuento de miembros del grupo.
+*(Método de autenticación: Certificado para Graph)*
 
 #### `sc-Generar-ReporteLicencias.ps1`
 
