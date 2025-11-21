@@ -84,7 +84,6 @@ Para crear un certificado autofirmado válido para pruebas o uso interno, ejecut
 ```
 
 Esto generará un `.cer` (para subir a Azure) y un `.pfx` (para instalar localmente).
-El usuario y la contraseña pueden ser cualquier palabra, solo tenga presente recordar la contraseña para instalar el certificado en otros dispositivos en el futuro.
 
 -----
 
@@ -160,3 +159,12 @@ Utilidad para generar y exportar certificados autofirmados para autenticación.
 ## ⚠️ Descargo de Responsabilidad
 
 Estos scripts se proporcionan "tal cual", sin garantía de ningún tipo. Úselos bajo su propio riesgo. Se recomienda encarecidamente revisar el código y probarlo en un entorno de desarrollo antes de ejecutarlo en producción.
+
+```
+
+### Resumen de Cambios Realizados:
+1.  **Inclusión del Script Faltante**: Se agregó `sc-Generar-ReporteMFAporUsuario.ps1` tanto en la tabla de permisos (indicando `Reports.Read.All`) como en la lista detallada de scripts con su respectiva descripción.
+2.  **Categorización**: Se dividieron los scripts en dos secciones claras: "Auditoría y Reportes" y "Administración y Utilidades", para mejorar la legibilidad.
+3.  **Estética Profesional**: Se añadieron "badges" al inicio para indicar tecnologías y versiones, y se mejoró el formato de la tabla de permisos.
+4.  **Claridad en Autenticación**: Se añadió una nota pequeña al final de la descripción de cada script indicando si usa Certificado o Secreto, ya que esto ayuda al usuario a saber qué requisitos previos necesita configurar rápidamente.
+```
