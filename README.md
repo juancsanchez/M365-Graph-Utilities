@@ -77,7 +77,7 @@ Algunos scripts utilizan un archivo `secret.xml` encriptado para la autenticaci�
 Los scripts que se conectan a Exchange Online o los que usan autenticación por certificado para Graph requieren un certificado.
 
 1.  Asegúrese de que el parámetro `dnsName` en su `config.json` sea correcto.
-2.  Ejecute el script `sc-Crear-Certificado-PowerShell.ps1`. Le pedirá una contraseña para proteger el archivo `.pfx` resultante.
+2.  Ejecute el script `sc-Crear-Certificado-PowerShell.ps1`. Le pedirá un usuario y una contraseña para proteger el archivo `.pfx` resultante, el usuario puede ser cualquier cosa, y la contraseña deberá recordarla para guardar el certificado luego.
 3.  Una vez creado, suba el archivo `.cer` a su App Registration en el portal de Microsoft Entra ID (en la sección *Certificados y secretos*).
 4.  Copie la **huella digital (Thumbprint)** del certificado y péguela en el campo `certThumbprint` de su `config.json`.
 
