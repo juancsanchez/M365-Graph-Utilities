@@ -77,32 +77,9 @@ catch {
 
 # Fin de parámetros de conexión desatendida
 
-# Se usa para la conexión a Microsoft Graph
-$secretFilePath = Join-Path -Path $PSScriptRoot -ChildPath "secret.xml"
-
-
-# --- Importación del Secreto de Cliente (para Microsoft Graph) ---
-if (-not (Test-Path $secretFilePath)) {
-    Write-Error "El archivo de secreto '$secretFilePath' no fue encontrado."
-    Write-Error "Para crearlo, ejecute: 'SU_SECRETO_AQUI' | ConvertTo-SecureString -AsPlainText -Force | Export-CliXml -Path '.\secret.xml'"
-    return
-}
-
-try {
-    $secureSecret = Import-CliXml -Path $secretFilePath
-}
-catch {
-    Write-Error "No se pudo importar el secreto desde '$secretFilePath'. Asegúrese de que el archivo no esté corrupto."
-    Write-Error $_.Exception.Message
-    return
-}
-
-
 # --- Conexión a Servicios ---
 try {
     Write-Host "Conectando a Microsoft Graph..." -ForegroundColor Cyan
-    # $credential = New-Object System.Management.Automation.PSCredential($clientId, $secureSecret)
-    # Connect-MgGraph -TenantId $tenantId -Credential $credential
     Connect-MgGraph -TenantId $TenantId -AppId $ClientId -CertificateThumbprint $certThumbprint
     Write-Host "Conexión a Microsoft Graph exitosa." -ForegroundColor Green
 
@@ -192,15 +169,17 @@ foreach ($user in $users) {
         if ($mailboxStats -and $mailboxStats.TotalItemSize) {
             # El TotalItemSize viene como un objeto ByteQuantifiedSize, lo convertimos a string para procesarlo
             $primaryMailboxSize = $mailboxStats.TotalItemSize.ToString()
-        } else {
-             $primaryMailboxSize = "Sin buzón"
+        }
+        else {
+            $primaryMailboxSize = "Sin buzón"
         }
 
         # Intentar obtener estadísticas del buzón de archivo
         $archiveStats = Get-MailboxStatistics -Identity $upn -Archive -ErrorAction SilentlyContinue
         if ($archiveStats -and $archiveStats.TotalItemSize) {
             $archiveMailboxSize = $archiveStats.TotalItemSize.ToString()
-        } else {
+        }
+        else {
             $archiveMailboxSize = "Sin archivo"
         }
     }
@@ -226,10 +205,12 @@ foreach ($user in $users) {
             if ($usedBytes -gt 0) {
                 # Convertir bytes a Gigabytes (GB)
                 $oneDriveSize = "{0:N2} GB" -f ($usedBytes / 1GB)
-            } else {
+            }
+            else {
                 $oneDriveSize = "0.00 GB"
             }
-        } else {
+        }
+        else {
             # Esto ocurre si el usuario tiene licencia pero nunca ha accedido a su OneDrive o no lo tiene aprovisionado.
             $oneDriveSize = "No aprovisionado"
         }

@@ -27,6 +27,7 @@ try {
     $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
     $tenantId = $config.tenantId
     $clientId = $config.clientId
+    $certThumbprint = $config.certThumbprint
 }
 catch {
     Write-Error "No se pudo leer o procesar el archivo de configuración '$configFilePath'. Verifique que el formato JSON sea correcto."
@@ -36,37 +37,14 @@ catch {
 
 # Fin de parámetros de conexión desatendida
 
-# --- Importación del Secreto de Cliente ---
-# El secreto se almacena en un archivo XML encriptado para mayor seguridad.
-$secretFilePath = Join-Path -Path $PSScriptRoot -ChildPath "secret.xml"
-
-if (-not (Test-Path $secretFilePath)) {
-    Write-Error "El archivo de secreto '$secretFilePath' no fue encontrado."
-    Write-Error "Para crearlo, ejecute este comando en PowerShell, reemplazando con su secreto real:"
-    Write-Error '"SU_SECRETO_AQUI" | ConvertTo-SecureString -AsPlainText -Force | Export-CliXml -Path ".\secret.xml"'
-    return
-}
-
-# Importar el secreto (SecureString) desde el archivo encriptado.
+# Paso 2: Conectarse a Microsoft Graph utilizando certificado.
 try {
-    $secureSecret = Import-CliXml -Path $secretFilePath
-}
-catch {
-    Write-Error "No se pudo importar el secreto desde '$secretFilePath'. Asegúrese de que el archivo no esté corrupto y que usted sea el mismo usuario que lo creó."
-    Write-Error $_.Exception.Message
-    return
-}
-
-# Paso 2: Conectarse a Microsoft Graph utilizando las credenciales de la aplicación.
-try {
-    Write-Host "Conectando a Microsoft Graph con credenciales de aplicación..." -ForegroundColor Cyan
-    # $credential = New-Object System.Management.Automation.PSCredential($clientId, $secureSecret)
-    # Connect-MgGraph -TenantId $tenantId -Credential $credential
-    Connect-MgGraph -TenantId $TenantId -AppId $ClientId -CertificateThumbprint $certThumbprint
+    Write-Host "Conectando a Microsoft Graph con certificado..." -ForegroundColor Cyan
+    Connect-MgGraph -TenantId $tenantId -AppId $clientId -CertificateThumbprint $certThumbprint
     Write-Host "Conexión exitosa." -ForegroundColor Green
 }
 catch {
-    Write-Error "No se pudo conectar a Microsoft Graph. Verifique las credenciales de la aplicación y los permisos."
+    Write-Error "No se pudo conectar a Microsoft Graph. Verifique el Thumbprint del certificado y los permisos."
     Write-Error $_.Exception.Message
     return
 }

@@ -8,7 +8,7 @@ Este repositorio contiene una colección de scripts de PowerShell optimizados pa
 
 ## 🚀 Características Principales
 
-* **Autenticación Segura**: Implementación de Service Principals utilizando Certificados (recomendado) y Secretos de Cliente encriptados localmente.
+* **Autenticación Segura**: Implementación de Service Principals utilizando Certificados (recomendado).
 * **Configuración Externalizada**: Gestión de parámetros sensibles (`tenantId`, `clientId`, etc.) mediante un archivo `config.json`, manteniendo el código limpio y seguro.
 * **Optimización**: Uso de técnicas de procesamiento en paralelo y filtros OData avanzados para manejar tenants de gran volumen.
 * **Salida Estructurada**: Generación automática de reportes en formato CSV (UTF-8) listos para análisis en Excel o Power BI.
@@ -66,25 +66,33 @@ Cree un archivo `config.json` en la raíz. Copie la siguiente estructura:
 
 *Nota: `certThumbprint`, `organizationName` y `dnsName` son obligatorios para scripts que usan autenticación por certificado.*
 
-### 3\. Seguridad de Secretos (Solo para scripts con Secreto)
+### 3. Configuración de Certificado (Paso a Paso)
 
-Para scripts que requieren un *Client Secret* en lugar de certificado, genere el archivo encriptado `secret.xml`:
+Para utilizar la autenticación segura por certificado (recomendada), siga estos pasos. Este proceso es compatible tanto con **Windows** como con **macOS**.
 
-```powershell
-"SU_CLIENT_SECRET_TEXTO_PLANO" | ConvertTo-SecureString -AsPlainText -Force | Export-CliXml -Path ".\secret.xml"
-```
-
-*Advertencia: El archivo `secret.xml` solo puede ser desencriptado por el usuario que lo creó en la misma máquina (DPAPI).*
-
-### 4\. Certificados
-
-Para crear un certificado autofirmado válido para pruebas o uso interno, ejecute:
+#### Paso A: Generar el Certificado
+Ejecute el script de utilidad incluido para crear un nuevo certificado autofirmado:
 
 ```powershell
 .\sc-Crear-Certificado-PowerShell.ps1
 ```
+*Esto generará dos archivos en la carpeta del script: un `.cer` (clave pública) y un `.pfx` (clave privada).*
 
-Esto generará un `.cer` (para subir a Azure) y un `.pfx` (para instalar localmente).
+#### Paso B: Cargar en Microsoft Entra ID
+1. Vaya al portal de Azure > **App registrations** > Seleccione su aplicación.
+2. Navegue a **Certificates & secrets** > Pestaña **Certificates**.
+3. Haga clic en **Upload certificate** y seleccione el archivo `.cer` generado en el paso anterior.
+4. Copie el valor del **Thumbprint** y péguelo en su archivo `config.json` en el campo `certThumbprint`.
+
+#### Paso C: Instalar en la Máquina Local
+Para que el script pueda autenticarse, el certificado con la clave privada debe estar instalado en el almacén de certificados del usuario actual.
+
+1. Localice el archivo `.pfx` generado.
+2. Haga doble clic para instalarlo (o use el comando `Import-PfxCertificate`).
+3. **Importante**: Instálelo en la ubicación **Current User** (Usuario Actual).
+4. Cuando se le solicite, ingrese la contraseña que definió al momento de crear el certificado.
+
+*Nota: Sin este paso, recibirá un error indicando que no se encuentra el certificado con el Thumbprint especificado.*
 
 -----
 
@@ -105,7 +113,7 @@ Auditoría unificada de Aplicaciones Empresariales (Modernas y Legacy). Identifi
 #### `sc-Generar-ReporteLicencias.ps1`
 
 Reporte detallado de licenciamiento por usuario. Traduce los `SkuPartNumber` a nombres comerciales legibles e incluye la última fecha de inicio de sesión.
-*(Auth: Secreto)*
+*(Auth: Certificado)*
 
 #### `sc-Generar-ReporteLicenciasGrupos.ps1`
 
@@ -120,7 +128,7 @@ Informe de consumo de almacenamiento. Incluye tamaño de buzón principal, buzó
 #### `sc-Generar-ReporteRolesAdmin.ps1`
 
 Identifica a los usuarios con roles privilegiados activos (Global Admin, Security Admin, etc.) en el directorio.
-*(Auth: Secreto)*
+*(Auth: Certificado)*
 
 #### `sc-Generar-ReportePermisosServicePrincipals.ps1`
 
