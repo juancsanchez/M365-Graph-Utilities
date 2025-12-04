@@ -41,6 +41,7 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 | **sc-Generar-ReportePermisosServicePrincipals.ps1**| Microsoft Graph | `Application.Read.All`, `AppRoleAssignment.ReadWrite.All`, `Directory.Read.All` |
 | **sc-Asignar-PermisosGraph-ManagedIdentity.ps1**| Microsoft Graph | `AppRoleAssignment.ReadWrite.All` |
 | **sc-Crear-AppRegistrations-Masivo.ps1** | Microsoft Graph | `Application.ReadWrite.All`, `User.Read.All`, `Directory.Read.All` |
+| **sc-Crear-Usuarios-Masivo.ps1** | Microsoft Graph | `User.ReadWrite.All` |
 
 ## ⚙️ Configuración Inicial
 
@@ -66,31 +67,35 @@ Cree un archivo `config.json` en la raíz. Copie la siguiente estructura:
 
 *Nota: `certThumbprint`, `organizationName` y `dnsName` son obligatorios para scripts que usan autenticación por certificado.*
 
-### 3. Configuración de Certificado (Paso a Paso)
+### 3\. Configuración de Certificado (Paso a Paso)
 
 Para utilizar la autenticación segura por certificado (recomendada), siga estos pasos. Este proceso es compatible tanto con **Windows** como con **macOS**.
 
 #### Paso A: Generar el Certificado
+
 Ejecute el script de utilidad incluido para crear un nuevo certificado autofirmado:
 
 ```powershell
 .\sc-Crear-Certificado-PowerShell.ps1
 ```
+
 *Esto generará dos archivos en la carpeta del script: un `.cer` (clave pública) y un `.pfx` (clave privada).*
 
 #### Paso B: Cargar en Microsoft Entra ID
-1. Vaya al portal de Azure > **App registrations** > Seleccione su aplicación.
-2. Navegue a **Certificates & secrets** > Pestaña **Certificates**.
-3. Haga clic en **Upload certificate** y seleccione el archivo `.cer` generado en el paso anterior.
-4. Copie el valor del **Thumbprint** y péguelo en su archivo `config.json` en el campo `certThumbprint`.
+
+1.  Vaya al portal de Azure \> **App registrations** \> Seleccione su aplicación.
+2.  Navegue a **Certificates & secrets** \> Pestaña **Certificates**.
+3.  Haga clic en **Upload certificate** y seleccione el archivo `.cer` generado en el paso anterior.
+4.  Copie el valor del **Thumbprint** y péguelo en su archivo `config.json` en el campo `certThumbprint`.
 
 #### Paso C: Instalar en la Máquina Local
+
 Para que el script pueda autenticarse, el certificado con la clave privada debe estar instalado en el almacén de certificados del usuario actual.
 
-1. Localice el archivo `.pfx` generado.
-2. Haga doble clic para instalarlo (o use el comando `Import-PfxCertificate`).
-3. **Importante**: Instálelo en la ubicación **Current User** (Usuario Actual).
-4. Cuando se le solicite, ingrese la contraseña que definió al momento de crear el certificado.
+1.  Localice el archivo `.pfx` generado.
+2.  Haga doble clic para instalarlo (o use el comando `Import-PfxCertificate`).
+3.  **Importante**: Instálelo en la ubicación **Current User** (Usuario Actual).
+4.  Cuando se le solicite, ingrese la contraseña que definió al momento de crear el certificado.
 
 *Nota: Sin este paso, recibirá un error indicando que no se encuentra el certificado con el Thumbprint especificado.*
 
@@ -146,6 +151,17 @@ Herramienta de diagnóstico que identifica grupos de seguridad o M365 compartido
 *(Auth: Certificado)*
 
 ### 🛠️ Administración y Utilidades
+
+#### `sc-Crear-Usuarios-Masivo.ps1`
+
+Crea usuarios masivamente en Entra ID a partir de un CSV, generando contraseñas aleatorias seguras que cumplen las políticas de complejidad. Genera un reporte final confidencial con las credenciales creadas y los detalles de la operación.
+*(Auth: Certificado)*
+
+**Estructura del CSV Requerido:**
+
+  * **Columnas Obligatorias:** `upn`, `DisplayName`
+  * **Columnas Opcionales:** `jobTitle`, `department`, `country`, `mobilePhone`, `firstName`, `lastName`
+  * *Nota: Si no se proporciona `DisplayName` pero sí `firstName` y `lastName`, el script lo construirá automáticamente.*
 
 #### `sc-Crear-AppRegistrations-Masivo.ps1`
 
