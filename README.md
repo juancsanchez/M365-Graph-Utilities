@@ -33,6 +33,7 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 | **sc-Generar-CuentaUsuariosLicenciados-Paralelo.ps1** | Microsoft Graph | `User.Read.All` |
 | **sc-Encontrar-GruposComunesUsuarios.ps1** | Microsoft Graph | `User.Read.All`, `Group.Read.All` |
 | **sc-Agregar-OwnerGrupos.ps1** | Microsoft Graph | `GroupMember.ReadWrite.All`, `User.Read.All`, `Application.Read.All` |
+| **sc-Gestionar-MembresiaGrupos-Masivo.ps1** | Microsoft Graph | `GroupMember.ReadWrite.All`, `User.Read.All` |
 | **sc-Generar-ReporteDeUsoM365.ps1** | Microsoft Graph | `User.Read.All`, `Files.Read.All`, `Directory.Read.All` |
 | | Exchange Online | `Exchange.ManageAsApp` (Requiere Rol de Admin en EXO) |
 | **sc-Generar-ReporteLicenciasGrupos.ps1** | Microsoft Graph | `Group.Read.All`, `GroupMember.Read.All` |
@@ -185,6 +186,19 @@ Script para asignar permisos de Graph API (App Roles) a una Managed Identity de 
 #### `sc-Crear-Certificado-PowerShell.ps1`
 
 Utilidad para generar y exportar certificados autofirmados para autenticación.
+
+#### `sc-Gestionar-MembresiaGrupos-Masivo.ps1`
+
+Gestiona el ciclo de vida de la membresía de usuarios en grupos (agregar o retirar) de forma masiva procesando un archivo CSV. El script es capaz de identificar el grupo objetivo por su ID (prioritario) o por su nombre exacto.
+*(Auth: Certificado)*
+
+**Estructura del CSV Requerido:**
+El archivo debe contener las siguientes columnas (el orden no es estricto, pero los nombres de encabezado sí):
+`upn,groupName,groupId,action`
+
+  * **upn**: El User Principal Name del usuario.
+  * **action**: Debe ser `agregar` o `retirar`.
+  * **groupId** / **groupName**: Se debe llenar al menos uno. El script prioriza `groupId`; si está vacío, buscará por `groupName`.
 
 ## 👤 Autor
 
