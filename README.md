@@ -43,6 +43,7 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 | **sc-Asignar-PermisosGraph-ManagedIdentity.ps1**| Microsoft Graph | `AppRoleAssignment.ReadWrite.All` |
 | **sc-Crear-AppRegistrations-Masivo.ps1** | Microsoft Graph | `Application.ReadWrite.All`, `User.Read.All`, `Directory.Read.All` |
 | **sc-Crear-Usuarios-Masivo.ps1** | Microsoft Graph | `User.ReadWrite.All` |
+| **sc-Investigar-SignIn-CorrelationId.ps1** | Microsoft Graph | `AuditLog.Read.All`, `Directory.Read.All` |
 
 ## ⚙️ Configuración Inicial
 
@@ -149,6 +150,11 @@ Obtiene un recuento rápido de usuarios licenciados en tenants muy grandes media
 #### `sc-Encontrar-GruposComunesUsuarios.ps1`
 
 Herramienta de diagnóstico que identifica grupos de seguridad o M365 compartidos entre una lista de usuarios proporcionada.
+*(Auth: Certificado)*
+
+#### `sc-Investigar-SignIn-CorrelationId.ps1`
+
+Investiga un intento de inicio de sesión fallido a partir de su Correlation ID. Muestra detalles del usuario, dispositivo, error técnico y analiza qué políticas de Acceso Condicional causaron el bloqueo.
 *(Auth: Certificado)*
 
 ### 🛠️ Administración y Utilidades
