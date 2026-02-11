@@ -114,7 +114,11 @@ Genera una radiografía del estado de seguridad de los usuarios. Detalla si tien
 
 #### `sc-Generar-ReporteAppsSSO.ps1`
 
-Auditoría unificada de Aplicaciones Empresariales (Modernas y Legacy). Identifica el tipo de SSO (SAML, OIDC), estado de la cuenta y conteo de usuarios/grupos asignados.
+Auditoría unificada de Aplicaciones Empresariales (Modernas y Legacy). 
+**Novedades v7.1**:
+- **Detalles Extendidos**: Nuevas columnas para *Identifier (SAML)* y *Reply URLs*.
+- **Modo de Prueba**: Opción interactiva para procesar un número limitado de apps (optimizado con `-Top`).
+- **Alto Rendimiento**: Utiliza procesamiento en paralelo (`-Parallel`) para manejar miles de aplicaciones rápidamente.
 *(Auth: Certificado)*
 
 #### `sc-Generar-ReporteLicencias.ps1`

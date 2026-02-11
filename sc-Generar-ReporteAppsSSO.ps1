@@ -1,26 +1,26 @@
 <#
 .SYNOPSIS
-    Genera un informe de auditoría unificado de las Aplicaciones Empresariales de tipo 'Application' y 'Legacy'.
+    Genera un informe unificado de Aplicaciones Empresariales ('Application' y 'Legacy') en CSV.
+    Incluye detalles de SSO (SAML/OIDC), URLs y asignaciones, con optimizaciones de rendimiento y modo de prueba.
 
 .DESCRIPTION
-    Este script se conecta a Microsoft Graph utilizando autenticación desatendida para obtener un listado combinado
-    de todos los Service Principals cuyo tipo es 'Application' o 'Legacy'.
-
-    El resultado final es un archivo CSV que incluye una columna 'App_Type' para diferenciar los tipos. La detección de SSO
-    y el conteo de asignaciones se realiza únicamente para las aplicaciones modernas.
+    Este script utiliza Microsoft Graph (autenticación desatendida) para listar Service Principals con type 'Application' o 'Legacy'.
+    Características principales:
+    - Identificación de tipo de SSO (SAML, OIDC, u Otro).
+    - Extracción de Identifiers y Reply URLs.
+    - Conteo de usuarios y grupos asignados (solo para Apps modernas).
+    - Modo de Prueba: Permite procesar un número limitado de apps para validar el script rápidamente.
+    - Procesamiento en Paralelo: Utiliza 'ForEach-Object -Parallel' para maximizar la velocidad en tenants grandes.
 
 .REQUIREMENTS
-    - Módulo de PowerShell: Microsoft.Graph.
-    - Un archivo 'config.json' en la misma carpeta con tenantId, clientId y certThumbprint.
-    - Permisos de API de Microsoft Graph requeridos para el Service Principal:
-        - Application.Read.All
-        - Directory.Read.All
-        - DelegatedPermissionGrant.Read.All
+    - Módulo: Microsoft.Graph (Submódulos: Applications, Identity.Directory, Users.Actions).
+    - Archivo 'config.json' con credenciales (Client Credentials + Certificado).
+    - Permisos mínimos: Application.Read.All, Directory.Read.All.
 
 .NOTES
     Autor: Juan Sanchez
-    Fecha: 2025-09-16
-    Versión: 7.0 - Informe unificado para Apps 'Application' y 'Legacy'.
+    Fecha: 2026-02-11
+    Versión: 7.1 - Optimización masiva (Parallel), Modo de Prueba (-Top) y detalles extendidos (URLs).
 #>
 
 # --- BLOQUE DE CONEXIÓN Y CONFIGURACIÓN ---
@@ -55,21 +55,37 @@ catch {
 $reportData = [System.Collections.Generic.List[object]]::new()
 
 try {
+    # --- MODO DE PRUEBA: Permite limitar la ejecución para validaciones rápidas ---
+    $testMode = Read-Host "¿Desea ejecutar una prueba? (S/N)"
+    $maxApps = 0
+    if ($testMode -eq 'S' -or $testMode -eq 's' -or $testMode -eq 'Si' -or $testMode -eq 'si' -or $testMode -eq 'SI' -or $testMode -eq 'sI') {
+        $maxApps = Read-Host "¿Cuántas aplicaciones desea procesar?"
+        Write-Host "Modo de prueba activado. Se procesarán las primeras $maxApps aplicaciones." -ForegroundColor Yellow
+    }
+
     # Obtener todas las aplicaciones de tipo 'Application' y 'Legacy' para el reporte
     Write-Host "Obteniendo aplicaciones 'Application' y 'Legacy' del tenant... (esto puede tardar varios minutos)"
-    $properties = "id,displayName,appId,accountEnabled,appRoleAssignmentRequired,preferredSingleSignOnMode,servicePrincipalType"
+    $properties = "id,displayName,appId,accountEnabled,appRoleAssignmentRequired,preferredSingleSignOnMode,servicePrincipalType,identifierUris,replyUrls"
     
-    # --- Consulta de producción unificada ---
-    $enterpriseApps = Get-MgServicePrincipal -Filter "servicePrincipalType in ('Application', 'Legacy')" -All -Property $properties
+    # --- Obtención de Apps (Optimizada con -Top para pruebas) ---
+    if ($testMode -eq 'S' -or $testMode -eq 's' -or $testMode -eq 'Si' -or $testMode -eq 'si' -or $testMode -eq 'SI' -or $testMode -eq 'sI') {
+        Write-Host "Modo Prueba: Obteniendo solo las primeras $maxApps aplicaciones..." -ForegroundColor Cyan
+        $enterpriseApps = Get-MgServicePrincipal -Filter "servicePrincipalType in ('Application', 'Legacy')" -Top $maxApps -Property $properties
+    }
+    else {
+        Write-Host "Modo Producción: Obteniendo TODAS las aplicaciones..." -ForegroundColor Cyan
+        $enterpriseApps = Get-MgServicePrincipal -Filter "servicePrincipalType in ('Application', 'Legacy')" -All -Property $properties
+    }
 
     $totalApps = $enterpriseApps.Count
     Write-Host "Se encontraron $totalApps aplicaciones para analizar."
 
-    $counter = 0
-    foreach ($app in $enterpriseApps) {
-        $counter++
-        Write-Progress -Activity "Analizando Aplicaciones Empresariales" -Status "($counter/$totalApps) - $($app.DisplayName)" -PercentComplete (($counter / $totalApps) * 100)
-
+    Write-Host "Procesando $($enterpriseApps.Count) aplicaciones en paralelo (ThrottleLimit: 20)..." -ForegroundColor Cyan
+    
+    # --- Procesamiento Paralelo: Acelera la consulta de detalles por app ---
+    $reportData = $enterpriseApps | ForEach-Object -Parallel {
+        $app = $_
+        
         # Inicializar variables
         $ssoType = "N/A"
         $userCount = "N/A"
@@ -77,9 +93,21 @@ try {
 
         # La lógica de SSO y asignaciones solo aplica a Apps de tipo 'Application'
         if ($app.ServicePrincipalType -eq 'Application') {
-            $assignedUsersAndGroups = Get-MgServicePrincipalAppRoleAssignedTo -ServicePrincipalId $app.Id -All
-            $userCount = ($assignedUsersAndGroups | Where-Object { $_.PrincipalType -eq 'User' }).Count
-            $groupCount = ($assignedUsersAndGraphs | Where-Object { $_.PrincipalType -eq 'Group' }).Count
+            try {
+                $assignedUsersAndGroups = Get-MgServicePrincipalAppRoleAssignedTo -ServicePrincipalId $app.Id -All -ErrorAction SilentlyContinue
+                if ($assignedUsersAndGroups) {
+                    $userCount = ($assignedUsersAndGroups | Where-Object { $_.PrincipalType -eq 'User' }).Count
+                    $groupCount = ($assignedUsersAndGroups | Where-Object { $_.PrincipalType -eq 'Group' }).Count
+                }
+                else {
+                    $userCount = 0
+                    $groupCount = 0
+                }
+            }
+            catch {
+                $userCount = "Error"
+                $groupCount = "Error"
+            }
 
             $ssoType = "Otro"
             
@@ -103,11 +131,13 @@ try {
                     if ($isOidc) {
                         $ssoType = "OIDC"
                     }
-                } catch {}
+                }
+                catch {}
             }
         }
         
-        $reportRecord = [PSCustomObject]@{
+        # Retornar el objeto para la colección
+        [PSCustomObject]@{
             "ApplicationName"         = $app.DisplayName
             "Application (Client) ID" = $app.AppId
             "App_Type"                = $app.ServicePrincipalType
@@ -116,9 +146,10 @@ try {
             "SSO_Type"                = $ssoType
             "AssignedUsers"           = $userCount
             "AssignedGroups"          = $groupCount
+            "Identifier (SAML)"       = ($app.IdentifierUris -join ", ")
+            "Reply URL"               = ($app.ReplyUrls -join ", ")
         }
-        $reportData.Add($reportRecord)
-    }
+    } -ThrottleLimit 20
 }
 catch {
     Write-Error "Ocurrió un error crítico durante el procesamiento: $($_.Exception.Message)"
@@ -135,12 +166,13 @@ finally {
         Write-Host "Proceso completado. Reporte generado en:" -ForegroundColor Green
         Write-Host $reportFilePath -ForegroundColor White
         Write-Host "--------------------------------------------------------" -ForegroundColor Cyan
-    } else {
+    }
+    else {
         Write-Warning "No se procesaron aplicaciones para generar un reporte."
     }
 
     if (Get-MgContext) {
         Write-Host "`nDesconectando de la sesión de Microsoft Graph."
-        Disconnect-MgGraph
+        Disconnect-MgGraph | Out-Null
     }
 }
