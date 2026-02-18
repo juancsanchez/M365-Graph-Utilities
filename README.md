@@ -44,6 +44,7 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 | **sc-Crear-AppRegistrations-Masivo.ps1** | Microsoft Graph | `Application.ReadWrite.All`, `User.Read.All`, `Directory.Read.All` |
 | **sc-Crear-Usuarios-Masivo.ps1** | Microsoft Graph | `User.ReadWrite.All` |
 | **sc-Investigar-SignIn-CorrelationId.ps1** | Microsoft Graph | `AuditLog.Read.All`, `Directory.Read.All` |
+| **sc-Encontrar-AlcanceGruposCA.ps1** | Microsoft Graph | `Policy.Read.All`, `Group.Read.All` |
 
 ## ⚙️ Configuración Inicial
 
@@ -159,6 +160,11 @@ Herramienta de diagnóstico que identifica grupos de seguridad o M365 compartido
 #### `sc-Investigar-SignIn-CorrelationId.ps1`
 
 Investiga un intento de inicio de sesión fallido a partir de su Correlation ID. Muestra detalles del usuario, dispositivo, error técnico y analiza qué políticas de Acceso Condicional causaron el bloqueo.
+*(Auth: Certificado)*
+
+#### `sc-Encontrar-AlcanceGruposCA.ps1`
+
+Identifica qué políticas de Acceso Condicional (CA) incluyen o excluyen grupos específicos de Microsoft Entra ID. Solicita al usuario una lista de Object IDs y audita si están explícitamente configurados en las políticas del tenant.
 *(Auth: Certificado)*
 
 ### 🛠️ Administración y Utilidades
