@@ -14,16 +14,16 @@
     - Para una Aplicación Empresarial (Enterprise App), utilice el 'Application (client) ID'.
     - Para un usuario, utilice su User Principal Name (UPN), por ejemplo, 'usuario@dattics.com'.
 
-.PARAMETER PrincipalType
-    Define el tipo de principal que se está agregando. Solo se aceptan dos valores:
-    - 'ServicePrincipal': Para una Aplicación Empresarial.
-    - 'User': Para una cuenta de usuario.
-
 .PARAMETER ExcelFilePath
     La ruta completa al archivo de Excel (.xlsx) que contiene la lista de grupos a procesar.
     IMPORTANTE: El archivo de Excel debe tener obligatoriamente dos columnas con los siguientes encabezados exactos:
     - 'Group': Contiene el nombre para mostrar (DisplayName) del grupo.
     - 'Object ID': Contiene el ID del objeto del grupo en Microsoft Entra ID.
+
+.PARAMETER PrincipalType
+    (Opcional) Define el tipo de principal. Si no se especifica, el script desplegará un menú interactivo para seleccionarlo.
+    - 'User': Para una cuenta de usuario.
+    - 'ServicePrincipal': Para una Aplicación Empresarial.
 
 .REQUIREMENTS
     - Módulos de PowerShell: Microsoft.Graph, ImportExcel.
@@ -31,30 +31,49 @@
     - Un archivo 'config.json' en la misma carpeta con tenantId, clientId y certThumbprint.
 
 .EXAMPLE
-    # Ejemplo 1: Agregar un usuario como propietario
-    .\sc-Agregar-OwnerGrupos-v4.ps1 -PrincipalId "usuario.demo@dattics.com" -PrincipalType User -ExcelFilePath "C:\Temp\Grupos.xlsx"
+    # Ejemplo 1: Ejecución interactiva (El script mostrará un menú para seleccionar el tipo de principal)
+    .\sc-Agregar-OwnerGrupos.ps1 -PrincipalId "usuario.demo@dattics.com" -ExcelFilePath "C:\Temp\Grupos.xlsx"
     
 .EXAMPLE
-    # Ejemplo 2: Agregar una aplicación como propietaria
-    .\sc-Agregar-OwnerGrupos-v4.ps1 -PrincipalId "0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d" -PrincipalType ServicePrincipal -ExcelFilePath "C:\Temp\Grupos.xlsx"
+    # Ejemplo 2: Ejecución desatendida (Ideal para automatización en Power Automate o Tareas Programadas)
+    .\sc-Agregar-OwnerGrupos.ps1 -PrincipalId "0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d" -PrincipalType ServicePrincipal -ExcelFilePath "C:\Temp\Grupos.xlsx"
 
 .NOTES
     Autor: Juan Sánchez
-    Fecha: 2025-08-29
-    Versión: 4.1 (Documentación de parámetros mejorada)
+    Fecha: 2026-02-23
+    Versión: 4.2 (Agregado menú de selección interactiva para PrincipalType)
 #>
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $true, HelpMessage = "Para Aplicaciones, ingrese el App ID. Para Usuarios, ingrese el UPN.")]
     [string]$PrincipalId,
 
-    [Parameter(Mandatory = $true, HelpMessage = "Especifique el tipo: 'User' para un usuario o 'ServicePrincipal' para una aplicación.")]
-    [ValidateSet('User', 'ServicePrincipal')]
-    [string]$PrincipalType,
-
     [Parameter(Mandatory = $true, HelpMessage = "Ruta al archivo Excel. Debe contener las columnas 'Group' y 'Object ID'.")]
-    [string]$ExcelFilePath
+    [string]$ExcelFilePath,
+    
+    [Parameter(Mandatory = $false, HelpMessage = "Opcional. Especifique el tipo: 'User' o 'ServicePrincipal'. Si se omite, se solicitará en un menú interactivo.")]
+    [ValidateSet('User', 'ServicePrincipal')]
+    [string]$PrincipalType
 )
+
+# --- INICIO: SELECCIÓN INTERACTIVA DEL TIPO DE PRINCIPAL ---
+if ([string]::IsNullOrWhiteSpace($PrincipalType)) {
+    Write-Host "`n"
+    $titulo = "Tipo de Principal"
+    $mensaje = "Seleccione el tipo de principal que corresponde al ID ingresado ($PrincipalId):"
+    
+    $opciones = [System.Management.Automation.Host.ChoiceDescription[]] @(
+        [System.Management.Automation.Host.ChoiceDescription]::new("&Usuario", "Cuenta de usuario normal (UPN)."),
+        [System.Management.Automation.Host.ChoiceDescription]::new("&Service Principal", "Aplicación Empresarial (App ID).")
+    )
+    
+    # El valor '0' indica que "Usuario" es la opción por defecto
+    $seleccion = $host.UI.PromptForChoice($titulo, $mensaje, $opciones, 0)
+
+    $PrincipalType = if ($seleccion -eq 0) { 'User' } else { 'ServicePrincipal' }
+    Write-Host "Tipo seleccionado: $PrincipalType`n" -ForegroundColor Cyan
+}
+# --- FIN: SELECCIÓN INTERACTIVA ---
 
 # --- INICIO: VERIFICACIÓN DE PRERREQUISITOS ---
 $requiredModules = @("Microsoft.Graph", "ImportExcel")
@@ -63,7 +82,8 @@ foreach ($moduleName in $requiredModules) {
         Write-Host "Instalando módulo '$moduleName'..." -ForegroundColor Yellow
         try {
             Install-Module $moduleName -Scope CurrentUser -Repository PSGallery -Force
-        } catch {
+        }
+        catch {
             Write-Error "No se pudo instalar el módulo '$moduleName'. Por favor, instálelo manualmente."
             return
         }
@@ -81,7 +101,8 @@ try {
     $tenantId = $config.tenantId
     $clientId = $config.clientId
     $certThumbprint = $config.certThumbprint
-} catch {
+}
+catch {
     Write-Error "Error al leer 'config.json'. Verifique su formato."
     return
 }
@@ -90,7 +111,8 @@ try {
     Write-Host "Conectando a Microsoft Graph con certificado..." -ForegroundColor Cyan
     Connect-MgGraph -TenantId $tenantId -AppId $clientId -CertificateThumbprint $certThumbprint
     Write-Host "Conexión exitosa." -ForegroundColor Green
-} catch {
+}
+catch {
     Write-Error "Falló la conexión a Microsoft Graph. Verifique los detalles en config.json y el certificado."
     return
 }
@@ -120,7 +142,7 @@ try {
     if (-not $principalToAdd) {
         throw "El principal con ID '$PrincipalId' y tipo '$PrincipalType' no fue encontrado."
     }
-    $principalDisplayName = if($principalToAdd.DisplayName){$principalToAdd.DisplayName} else{$principalToAdd.AppId}
+    $principalDisplayName = if ($principalToAdd.DisplayName) { $principalToAdd.DisplayName } else { $principalToAdd.AppId }
     Write-Host "Principal '$($principalDisplayName)' encontrado (ID: $($principalToAdd.Id))." -ForegroundColor Green
 
     # 3. Leer los datos del archivo Excel
@@ -157,7 +179,7 @@ try {
             }
             
             # Construir el BodyParameter para la referencia
-            $ownerRef = @{"@odata.id" = "https://graph.microsoft.com/v1.0/directoryObjects/$($principalToAdd.Id)"}
+            $ownerRef = @{"@odata.id" = "https://graph.microsoft.com/v1.0/directoryObjects/$($principalToAdd.Id)" }
             
             Write-Host "Agregando a '$principalDisplayName' como propietario del grupo '$($group.DisplayName)'..."
             New-MgGroupOwnerByRef -GroupId $group.Id -BodyParameter $ownerRef -ErrorAction Stop
@@ -170,13 +192,16 @@ try {
                 $status = "Advertencia"
                 $reason = "El principal ya es propietario de este grupo."
                 Write-Warning "El principal ya es propietario del grupo '$($group.DisplayName)'."
-            } else {
+            }
+            else {
                 $status = "Error"
                 if ($_.Exception.Message -like "*Request_ResourceNotFound*") {
                     $reason = "El grupo no fue encontrado en Microsoft Entra ID."
-                } elseif ($_.Exception.Message -like "*Authorization_RequestDenied*") {
+                }
+                elseif ($_.Exception.Message -like "*Authorization_RequestDenied*") {
                     $reason = "Permisos insuficientes. Se requiere 'GroupMember.ReadWrite.All'."
-                } else {
+                }
+                else {
                     $reason = $_.Exception.Message
                 }
                 Write-Warning "Ocurrió un error con el grupo '$currentGroupIdentifier': $reason"
@@ -185,11 +210,11 @@ try {
         
         # Agregar el resultado al reporte
         $reportData.Add([PSCustomObject]@{
-            GrupoIdentificador = $currentGroupIdentifier
-            NombreEncontrado   = if ($group) { $group.DisplayName } else { "N/A" }
-            Estado             = $status
-            Detalle            = $reason
-        })
+                GrupoIdentificador = $currentGroupIdentifier
+                NombreEncontrado   = if ($group) { $group.DisplayName } else { "N/A" }
+                Estado             = $status
+                Detalle            = $reason
+            })
     }
 }
 catch {
@@ -209,7 +234,8 @@ finally {
         Write-Host $reportFilePath -ForegroundColor White
         Write-Host "--------------------------------------------------------" -ForegroundColor Cyan
         $reportData | Format-Table -AutoSize
-    } else {
+    }
+    else {
         Write-Warning "No se procesaron grupos para generar un reporte."
     }
 
