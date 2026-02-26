@@ -169,6 +169,15 @@ Identifica qué políticas de Acceso Condicional (CA) incluyen o excluyen grupos
 
 ### 🛠️ Administración y Utilidades
 
+#### `sc-Renombrar-PoliticasIntune-Masivo.ps1`
+
+Automatiza la actualización masiva de nombres de múltiples tipos de políticas en Microsoft Intune (Device Configuration, Settings Catalog, Compliance, Endpoint Security, Scripts, Update Rings y Administrative Templates) basándose en un archivo CSV. Utiliza APIs en versión beta en los casos necesarios para localizar todos los perfiles de configuración de forma transparente.
+*(Auth: Certificado)*
+
+**Estructura del CSV Requerido:**
+El archivo debe contener exactamente las siguientes columnas (encabezados):
+`Nombre actual`, `Nombre sugerido`
+
 #### `sc-Crear-Usuarios-Masivo.ps1`
 
 Crea usuarios masivamente en Entra ID a partir de un CSV, generando contraseñas aleatorias seguras que cumplen las políticas de complejidad. Genera un reporte final confidencial con las credenciales creadas y los detalles de la operación.
