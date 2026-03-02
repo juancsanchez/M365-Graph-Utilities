@@ -45,6 +45,7 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 | **sc-Crear-Usuarios-Masivo.ps1** | Microsoft Graph | `User.ReadWrite.All` |
 | **sc-Investigar-SignIn-CorrelationId.ps1** | Microsoft Graph | `AuditLog.Read.All`, `Directory.Read.All` |
 | **sc-Encontrar-AlcanceGruposCA.ps1** | Microsoft Graph | `Policy.Read.All`, `Group.Read.All` |
+| **sc-Renombrar-Grupos-Masivo.ps1** | Microsoft Graph | `Group.ReadWrite.All` |
 
 ## ⚙️ Configuración Inicial
 
@@ -52,12 +53,11 @@ Asegúrese de que el *Service Principal* de su App Registration tenga los siguie
 ```bash
 git clone <URL_DEL_REPOSITORIO>
 cd <NOMBRE_CARPETA_REPOSITORIO>
-````
+```
 
 ### 2\. Archivo de Configuración (config.json)
 
 Cree un archivo `config.json` en la raíz. Copie la siguiente estructura:
-
 ```json
 {
   "tenantId": "SU_GUID_DE_TENANT",
@@ -77,7 +77,6 @@ Para utilizar la autenticación segura por certificado (recomendada), siga estos
 #### Paso A: Generar el Certificado
 
 Ejecute el script de utilidad incluido para crear un nuevo certificado autofirmado:
-
 ```powershell
 .\sc-Crear-Certificado-PowerShell.ps1
 ```
@@ -168,6 +167,19 @@ Identifica qué políticas de Acceso Condicional (CA) incluyen o excluyen grupos
 *(Auth: Certificado)*
 
 ### 🛠️ Administración y Utilidades
+
+#### `sc-Renombrar-Grupos-Masivo.ps1`
+
+Renombra masivamente grupos de seguridad en Microsoft Entra ID a partir de un archivo CSV. El script prioriza la búsqueda por Object ID para evitar ambigüedades; si el ID no está disponible, realiza un fallback por DisplayName exacto. Detecta automáticamente grupos que ya tienen el nombre correcto para evitar llamadas innecesarias a la API, y genera un reporte final con el estado de cada operación (Exitoso, Omitido, Error).
+*(Auth: Certificado)*
+
+**Estructura del CSV Requerido:**
+El archivo debe contener exactamente las siguientes columnas (encabezados):
+`nombreActual,groupId,nombreNuevo`
+
+* **nombreActual**: Nombre actual del grupo. Se usa como fallback de búsqueda si `groupId` está vacío.
+* **groupId**: Object ID del grupo en Entra ID. Prioritario y recomendado para evitar conflictos con nombres duplicados.
+* **nombreNuevo**: Nombre que se asignará al grupo.
 
 #### `sc-Renombrar-PoliticasIntune-Masivo.ps1`
 
