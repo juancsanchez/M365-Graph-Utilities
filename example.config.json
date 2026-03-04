@@ -1,7 +1,16 @@
 {
-  "tenantId": "00000000-0000-0000-0000-000000000000",
-  "clientId": "11111111-1111-1111-1111-111111111111",
+  "_comentarios": {
+    "uso": "Copie este archivo, renómbrelo a config.json y reemplace todos los valores de ejemplo con los datos reales de su tenant.",
+    "git": "Asegúrese de que config.json esté en el .gitignore para no exponer credenciales reales en el repositorio.",
+    "tenantId": "GUID único de su organización en Microsoft Entra ID. Encuéntrelo en: Entra ID → Overview → Tenant ID. Formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "clientId": "Application (Client) ID del App Registration creado en Entra ID. Encuéntrelo en: App registrations → su app → Overview → Application (client) ID. Formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "organizationName": "Dominio principal del tenant en formato .onmicrosoft.com. Requerido por scripts que se conectan a Exchange Online. Encuéntrelo en: Entra ID → Overview → Primary domain.",
+    "certThumbprint": "Huella digital (Thumbprint) del certificado autofirmado asociado al App Registration. Pasos: (1) Genere el certificado con Utils/sc-Crear-Certificado-PowerShell.ps1, (2) suba el .cer en App registrations → Certificates & secrets → Certificates, (3) copie el Thumbprint que aparece tras la carga. Formato: cadena hexadecimal de 40 caracteres.",
+    "dnsName": "Nombre DNS usado como Subject al generar el certificado autofirmado con sc-Crear-Certificado-PowerShell.ps1. No necesita ser un dominio real ni estar registrado en DNS. Ejemplo: automatizacion.sudominio.com"
+  },
+  "tenantId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "clientId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   "organizationName": "suorganizacion.onmicrosoft.com",
-  "certThumbprint": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1B2",
+  "certThumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
   "dnsName": "automatizacion.sudominio.com"
 }

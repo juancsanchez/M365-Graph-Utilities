@@ -193,7 +193,7 @@ SharePoint Online
       │
       │ (descarga vía HTTPS — PnP.PowerShell)
       ▼
- Azure VM (Windows Server)
+ Azure VM (Windows Server o Windows 11)
  misma región que el Storage Account
       │
       │ (transferencia interna — AzCopy vía Service Endpoint)
@@ -203,7 +203,7 @@ SharePoint Online
 
 ### Paso 1 — Crear la VM en la misma región que el Storage Account
 
-1. En el **Azure Portal**, cree una VM con **Windows Server 2022**
+1. En el **Azure Portal**, cree una VM con **Windows Server o Windows 11**
 2. Seleccione la **misma región** donde está el Storage Account (ej: `East US`, `West Europe`)
 3. Tamaño recomendado: `Standard_D4s_v3` o superior (4 vCPU, 16 GB RAM)
 4. Asegúrese de que la VM esté en la misma **Virtual Network (VNet)** desde la que configurará el Service Endpoint
