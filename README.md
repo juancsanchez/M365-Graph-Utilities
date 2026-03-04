@@ -4,60 +4,63 @@
 ![Microsoft Graph](https://img.shields.io/badge/Microsoft%20Graph-API-blueviolet)
 ![Entra ID](https://img.shields.io/badge/Microsoft-Entra%20ID-0078D4)
 
-Este repositorio contiene una colección de scripts de PowerShell optimizados para automatizar tareas de administración, auditoría y generación de informes en entornos de Microsoft 365. Los scripts están diseñados para operar con **autenticación desatendida** (App-Only) a través de Microsoft Entra ID, garantizando seguridad y eficiencia en ejecuciones programadas.
+Colección de scripts de PowerShell para automatizar tareas de administración, auditoría y generación de informes en entornos de Microsoft 365. Los scripts operan con **autenticación desatendida (App-Only)** mediante certificados en Microsoft Entra ID.
+
+---
+
+## 📁 Estructura del Repositorio
+
+```
+📁 Raíz
+├── 📁 Auditoria-Reportes/          # Scripts de solo lectura que generan reportes CSV
+├── 📁 Grupos/                      # Operaciones sobre grupos de Entra ID
+├── 📁 Usuarios-Licencias/          # Creación y gestión de cuentas de usuario
+├── 📁 Apps-ServicePrincipals/      # App Registrations y Managed Identities
+├── 📁 Intune/                      # Gestión de políticas de dispositivos
+├── 📁 Migracion-SharePoint-AzFiles/ # Migración de SharePoint Online a Azure Files
+├── 📁 Utils/                       # Herramientas de soporte (certificados, etc.)
+├── example.config.json             # Plantilla de configuración
+├── .gitignore
+└── README.md
+```
+
+---
 
 ## 🚀 Características Principales
 
-* **Autenticación Segura**: Implementación de Service Principals utilizando Certificados (recomendado).
-* **Configuración Externalizada**: Gestión de parámetros sensibles (`tenantId`, `clientId`, etc.) mediante un archivo `config.json`, manteniendo el código limpio y seguro.
-* **Optimización**: Uso de técnicas de procesamiento en paralelo y filtros OData avanzados para manejar tenants de gran volumen.
-* **Salida Estructurada**: Generación automática de reportes en formato CSV (UTF-8) listos para análisis en Excel o Power BI.
-* **Gestión de Dependencias**: Verificación e instalación automática de módulos requeridos (`Microsoft.Graph`, `ExchangeOnlineManagement`).
+- **Autenticación Segura**: Service Principals con certificados (recomendado).
+- **Configuración Externalizada**: Parámetros sensibles gestionados en `config.json`, excluido del repositorio vía `.gitignore`.
+- **Optimización**: Procesamiento en paralelo y filtros OData para tenants de gran volumen.
+- **Salida Estructurada**: Reportes en CSV (UTF-8) listos para Excel o Power BI.
+- **Gestión de Dependencias**: Instalación automática de módulos requeridos.
+
+---
 
 ## 📋 Prerrequisitos
 
-* **PowerShell**: Versión 5.1 o superior (Se recomienda PowerShell 7+ para scripts que utilizan `-Parallel`).
-* **Módulos**: Los scripts intentarán instalar los módulos necesarios, pero se recomienda tener actualizados:
-    * `Microsoft.Graph`
-    * `ExchangeOnlineManagement`
-* **Entra ID App Registration**: Una aplicación registrada con los permisos de API adecuados.
+- **PowerShell**: 5.1 o superior (se recomienda 7+ para scripts con `-Parallel`).
+- **Módulos**: `Microsoft.Graph`, `ExchangeOnlineManagement`. Los scripts los instalan automáticamente si no están presentes.
+- **Entra ID App Registration**: Con los permisos de API correspondientes a cada script.
 
-## 🔐 Permisos de API Requeridos
-
-Asegúrese de que el *Service Principal* de su App Registration tenga los siguientes permisos de API (tipo `Application`) consentidos por un administrador:
-
-| Script | API | Permisos Mínimos |
-| :--- | :--- | :--- |
-| **sc-Generar-ReporteMFAporUsuario.ps1** | Microsoft Graph | `Reports.Read.All` o `AuditLog.Read.All` |
-| **sc-Generar-ReporteAppsSSO.ps1** | Microsoft Graph | `Application.Read.All`, `Directory.Read.All`, `DelegatedPermissionGrant.Read.All` |
-| **sc-Generar-CuentaUsuariosLicenciados-Paralelo.ps1** | Microsoft Graph | `User.Read.All` |
-| **sc-Encontrar-GruposComunesUsuarios.ps1** | Microsoft Graph | `User.Read.All`, `Group.Read.All` |
-| **sc-Agregar-OwnerGrupos.ps1** | Microsoft Graph | `GroupMember.ReadWrite.All`, `User.Read.All`, `Application.Read.All` |
-| **sc-Gestionar-MembresiaGrupos-Masivo.ps1** | Microsoft Graph | `GroupMember.ReadWrite.All`, `User.Read.All` |
-| **sc-Generar-ReporteDeUsoM365.ps1** | Microsoft Graph | `User.Read.All`, `Files.Read.All`, `Directory.Read.All` |
-| | Exchange Online | `Exchange.ManageAsApp` (Requiere Rol de Admin en EXO) |
-| **sc-Generar-ReporteLicenciasGrupos.ps1** | Microsoft Graph | `Group.Read.All`, `GroupMember.Read.All` |
-| **sc-Generar-ReporteLicencias.ps1** | Microsoft Graph | `User.Read.All`, `Directory.Read.All`, `AuditLog.Read.All` |
-| **sc-Generar-ReporteRolesAdmin.ps1** | Microsoft Graph | `RoleManagement.Read.Directory`, `User.Read.All` |
-| **sc-Generar-ReportePermisosServicePrincipals.ps1**| Microsoft Graph | `Application.Read.All`, `AppRoleAssignment.ReadWrite.All`, `Directory.Read.All` |
-| **sc-Asignar-PermisosGraph-ManagedIdentity.ps1**| Microsoft Graph | `AppRoleAssignment.ReadWrite.All` |
-| **sc-Crear-AppRegistrations-Masivo.ps1** | Microsoft Graph | `Application.ReadWrite.All`, `User.Read.All`, `Directory.Read.All` |
-| **sc-Crear-Usuarios-Masivo.ps1** | Microsoft Graph | `User.ReadWrite.All` |
-| **sc-Investigar-SignIn-CorrelationId.ps1** | Microsoft Graph | `AuditLog.Read.All`, `Directory.Read.All` |
-| **sc-Encontrar-AlcanceGruposCA.ps1** | Microsoft Graph | `Policy.Read.All`, `Group.Read.All` |
-| **sc-Renombrar-Grupos-Masivo.ps1** | Microsoft Graph | `Group.ReadWrite.All` |
+---
 
 ## ⚙️ Configuración Inicial
 
-### 1. Clonar el Repositorio
+### 1. Clonar el repositorio
+
 ```bash
 git clone <URL_DEL_REPOSITORIO>
 cd <NOMBRE_CARPETA_REPOSITORIO>
 ```
 
-### 2\. Archivo de Configuración (config.json)
+### 2. Crear el archivo de configuración
 
-Cree un archivo `config.json` en la raíz. Copie la siguiente estructura:
+Copia la plantilla y completa los valores reales:
+
+```bash
+Copy-Item example.config.json config.json
+```
+
 ```json
 {
   "tenantId": "SU_GUID_DE_TENANT",
@@ -68,179 +71,195 @@ Cree un archivo `config.json` en la raíz. Copie la siguiente estructura:
 }
 ```
 
-*Nota: `certThumbprint`, `organizationName` y `dnsName` son obligatorios para scripts que usan autenticación por certificado.*
+> ⚠️ `config.json` está excluido del repositorio por `.gitignore`. Nunca lo subas al control de versiones.
 
-### 3\. Configuración de Certificado (Paso a Paso)
+### 3. Configurar el certificado
 
-Para utilizar la autenticación segura por certificado (recomendada), siga estos pasos. Este proceso es compatible tanto con **Windows** como con **macOS**.
+#### Paso A — Generar el certificado
 
-#### Paso A: Generar el Certificado
-
-Ejecute el script de utilidad incluido para crear un nuevo certificado autofirmado:
 ```powershell
-.\sc-Crear-Certificado-PowerShell.ps1
+.\Utils\sc-Crear-Certificado-PowerShell.ps1
 ```
 
-*Esto generará dos archivos en la carpeta del script: un `.cer` (clave pública) y un `.pfx` (clave privada).*
+Genera dos archivos: `.cer` (clave pública) y `.pfx` (clave privada con contraseña).
 
-#### Paso B: Cargar en Microsoft Entra ID
+#### Paso B — Cargar en Microsoft Entra ID
 
-1.  Vaya al portal de Azure \> **App registrations** \> Seleccione su aplicación.
-2.  Navegue a **Certificates & secrets** \> Pestaña **Certificates**.
-3.  Haga clic en **Upload certificate** y seleccione el archivo `.cer` generado en el paso anterior.
-4.  Copie el valor del **Thumbprint** y péguelo en su archivo `config.json` en el campo `certThumbprint`.
+1. Ve a **Entra ID** → **App registrations** → tu aplicación.
+2. Navega a **Certificates & secrets** → **Certificates** → **Upload certificate**.
+3. Sube el archivo `.cer` y copia el **Thumbprint** al campo `certThumbprint` de `config.json`.
 
-#### Paso C: Instalar en la Máquina Local
+#### Paso C — Instalar en la máquina local
 
-Para que el script pueda autenticarse, el certificado con la clave privada debe estar instalado en el almacén de certificados del usuario actual.
+Instala el archivo `.pfx` en el almacén **Current User → Personal** haciendo doble clic o con:
 
-1.  Localice el archivo `.pfx` generado.
-2.  Haga doble clic para instalarlo (o use el comando `Import-PfxCertificate`).
-3.  **Importante**: Instálelo en la ubicación **Current User** (Usuario Actual).
-4.  Cuando se le solicite, ingrese la contraseña que definió al momento de crear el certificado.
+```powershell
+Import-PfxCertificate -FilePath ".\cert-*.pfx" -CertStoreLocation "Cert:\CurrentUser\My"
+```
 
-*Nota: Sin este paso, recibirá un error indicando que no se encuentra el certificado con el Thumbprint especificado.*
+---
 
------
+## 🔐 Permisos de API Requeridos
 
-## 📂 Scripts Incluidos
+Todos los scripts usan permisos de tipo **Application** que deben ser consentidos por un administrador del tenant.
 
-### 📊 Auditoría y Reportes
+| Script | Permisos Mínimos |
+| :--- | :--- |
+| `sc-Generar-ReporteMFAporUsuario` | `Reports.Read.All` o `AuditLog.Read.All` |
+| `sc-Generar-ReporteAppsSSO` | `Application.Read.All`, `Directory.Read.All`, `DelegatedPermissionGrant.Read.All` |
+| `sc-Generar-CuentaUsuariosLicenciados-Paralelo` | `User.Read.All` |
+| `sc-Encontrar-GruposComunesUsuarios` | `User.Read.All`, `Group.Read.All` |
+| `sc-Agregar-OwnerGrupos` | `GroupMember.ReadWrite.All`, `User.Read.All`, `Application.Read.All` |
+| `sc-Gestionar-MembresiaGrupos-Masivo` | `GroupMember.ReadWrite.All`, `User.Read.All` |
+| `sc-Renombrar-GruposSeguridad` | `Group.ReadWrite.All` |
+| `sc-Generar-ReporteDeUsoM365` | `User.Read.All`, `Files.Read.All`, `Directory.Read.All`, `Exchange.ManageAsApp` |
+| `sc-Generar-ReporteLicenciasGrupos` | `Group.Read.All`, `GroupMember.Read.All` |
+| `sc-Generar-ReporteLicencias` | `User.Read.All`, `Directory.Read.All`, `AuditLog.Read.All` |
+| `sc-Generar-ReporteRolesAdmin` | `RoleManagement.Read.Directory`, `User.Read.All` |
+| `sc-Generar-ReportePermisosServicePrincipals` | `Application.Read.All`, `AppRoleAssignment.ReadWrite.All`, `Directory.Read.All` |
+| `sc-Asignar-PermisosGraph-ManagedIdentity` | `AppRoleAssignment.ReadWrite.All` |
+| `sc-Crear-AppRegistrations-Masivo` | `Application.ReadWrite.All`, `User.Read.All`, `Directory.Read.All` |
+| `sc-Crear-Usuarios-Masivo` | `User.ReadWrite.All` |
+| `sc-Investigar-SignIn-CorrelationId` | `AuditLog.Read.All`, `Directory.Read.All` |
+| `sc-Encontrar-AlcanceGruposCA` | `Policy.Read.All`, `Group.Read.All` |
+| `sc-Renombrar-PoliticasIntune-Masivo` | `DeviceManagementConfiguration.ReadWrite.All` |
+
+---
+
+## 📂 Scripts por Carpeta
+
+---
+
+### 📊 Auditoria-Reportes/
+
+Scripts de solo lectura que generan un archivo CSV como salida. No modifican datos del tenant.
 
 #### `sc-Generar-ReporteMFAporUsuario.ps1`
-
-Genera una radiografía del estado de seguridad de los usuarios. Detalla si tienen MFA registrado, el estado de SSPR, si son *Passwordless Capable* y lista todos los métodos de autenticación configurados (Authenticator, Teléfono, FIDO2, etc.).
-*(Auth: Certificado)*
+Radiografía del estado de MFA por usuario: métodos registrados (Authenticator, FIDO2, Teléfono, etc.), estado de SSPR, método predeterminado y capacidad Passwordless. Usa la API de reportes de Graph para máxima eficiencia.
 
 #### `sc-Generar-ReporteAppsSSO.ps1`
-
-Auditoría unificada de Aplicaciones Empresariales (Modernas y Legacy). 
-**Novedades v7.1**:
-- **Detalles Extendidos**: Nuevas columnas para *Identifier (SAML)* y *Reply URLs*.
-- **Modo de Prueba**: Opción interactiva para procesar un número limitado de apps (optimizado con `-Top`).
-- **Alto Rendimiento**: Utiliza procesamiento en paralelo (`-Parallel`) para manejar miles de aplicaciones rápidamente.
-*(Auth: Certificado)*
+Auditoría unificada de Aplicaciones Empresariales (modernas y legacy). Identifica tipo de SSO (SAML/OIDC), Identifier URIs, Reply URLs y conteo de usuarios y grupos asignados. Soporta modo de prueba con `-Top` y procesamiento paralelo.
 
 #### `sc-Generar-ReporteLicencias.ps1`
-
-Reporte detallado de licenciamiento por usuario. Traduce los `SkuPartNumber` a nombres comerciales legibles e incluye la última fecha de inicio de sesión.
-*(Auth: Certificado)*
+Reporte de licenciamiento por usuario con nombres comerciales legibles (ej: "Microsoft 365 E5") e incluye la última fecha de inicio de sesión.
 
 #### `sc-Generar-ReporteLicenciasGrupos.ps1`
-
-Analiza el *Group-Based Licensing*. Muestra qué licencias están asignadas a qué grupos, incluyendo planes de servicio deshabilitados específicamente y conteo de miembros.
-*(Auth: Certificado)*
+Auditoría de Group-Based Licensing: qué licencias están asignadas a qué grupos, planes de servicio deshabilitados y conteo de miembros.
 
 #### `sc-Generar-ReporteDeUsoM365.ps1`
-
-Informe de consumo de almacenamiento. Incluye tamaño de buzón principal, buzón de archivo y uso de OneDrive for Business por usuario.
-*(Auth: Certificado + Exchange Online)*
+Informe de almacenamiento por usuario: tamaño de buzón principal, buzón de archivo y uso de OneDrive for Business. Requiere conexión a Exchange Online además de Graph.
 
 #### `sc-Generar-ReporteRolesAdmin.ps1`
-
-Identifica a los usuarios con roles privilegiados activos (Global Admin, Security Admin, etc.) en el directorio.
-*(Auth: Certificado)*
+Identifica usuarios con roles privilegiados activos (Global Admin, Security Admin, etc.).
 
 #### `sc-Generar-ReportePermisosServicePrincipals.ps1`
-
-Auditoría de seguridad que lista todos los permisos de API asignados a los Service Principals del tenant, con alertas sobre permisos de alto privilegio.
-*(Auth: Certificado)*
+Auditoría de seguridad de todos los permisos de API asignados a Service Principals, con alertas sobre permisos de alto privilegio.
 
 #### `sc-Generar-CuentaUsuariosLicenciados-Paralelo.ps1`
-
-Obtiene un recuento rápido de usuarios licenciados en tenants muy grandes mediante procesamiento multi-hilo (`-Parallel`).
-*(Auth: Certificado)*
-
-#### `sc-Encontrar-GruposComunesUsuarios.ps1`
-
-Herramienta de diagnóstico que identifica grupos de seguridad o M365 compartidos entre una lista de usuarios proporcionada.
-*(Auth: Certificado)*
+Recuento rápido de usuarios licenciados en tenants muy grandes. Usa `ForEach-Object -Parallel` (requiere PowerShell 7+).
 
 #### `sc-Investigar-SignIn-CorrelationId.ps1`
+Diagnóstico de un intento de inicio de sesión fallido a partir de su Correlation ID. Muestra detalles del usuario, dispositivo, código de error y análisis de qué políticas de Acceso Condicional causaron el bloqueo.
 
-Investiga un intento de inicio de sesión fallido a partir de su Correlation ID. Muestra detalles del usuario, dispositivo, error técnico y analiza qué políticas de Acceso Condicional causaron el bloqueo.
-*(Auth: Certificado)*
+---
+
+### 👥 Grupos/
+
+Operaciones de lectura y escritura sobre grupos de Microsoft Entra ID.
+
+#### `sc-Encontrar-GruposComunesUsuarios.ps1`
+Identifica grupos de seguridad y Microsoft 365 compartidos entre 3 a 5 usuarios. Útil para diagnóstico de membresías.
 
 #### `sc-Encontrar-AlcanceGruposCA.ps1`
-
-Identifica qué políticas de Acceso Condicional (CA) incluyen o excluyen grupos específicos de Microsoft Entra ID. Solicita al usuario una lista de Object IDs y audita si están explícitamente configurados en las políticas del tenant.
-*(Auth: Certificado)*
-
-### 🛠️ Administración y Utilidades
-
-#### `sc-Renombrar-Grupos-Masivo.ps1`
-
-Renombra masivamente grupos de seguridad en Microsoft Entra ID a partir de un archivo CSV. El script prioriza la búsqueda por Object ID para evitar ambigüedades; si el ID no está disponible, realiza un fallback por DisplayName exacto. Detecta automáticamente grupos que ya tienen el nombre correcto para evitar llamadas innecesarias a la API, y genera un reporte final con el estado de cada operación (Exitoso, Omitido, Error).
-*(Auth: Certificado)*
-
-**Estructura del CSV Requerido:**
-El archivo debe contener exactamente las siguientes columnas (encabezados):
-`nombreActual,groupId,nombreNuevo`
-
-* **nombreActual**: Nombre actual del grupo. Se usa como fallback de búsqueda si `groupId` está vacío.
-* **groupId**: Object ID del grupo en Entra ID. Prioritario y recomendado para evitar conflictos con nombres duplicados.
-* **nombreNuevo**: Nombre que se asignará al grupo.
-
-#### `sc-Renombrar-PoliticasIntune-Masivo.ps1`
-
-Automatiza la actualización masiva de nombres de múltiples tipos de políticas en Microsoft Intune (Device Configuration, Settings Catalog, Compliance, Endpoint Security, Scripts, Update Rings y Administrative Templates) basándose en un archivo CSV. Utiliza APIs en versión beta en los casos necesarios para localizar todos los perfiles de configuración de forma transparente.
-*(Auth: Certificado)*
-
-**Estructura del CSV Requerido:**
-El archivo debe contener exactamente las siguientes columnas (encabezados):
-`Nombre actual`, `Nombre sugerido`
-
-#### `sc-Crear-Usuarios-Masivo.ps1`
-
-Crea usuarios masivamente en Entra ID a partir de un CSV, generando contraseñas aleatorias seguras que cumplen las políticas de complejidad. Genera un reporte final confidencial con las credenciales creadas y los detalles de la operación.
-*(Auth: Certificado)*
-
-**Estructura del CSV Requerido:**
-
-  * **Columnas Obligatorias:** `upn`, `DisplayName`
-  * **Columnas Opcionales:** `jobTitle`, `department`, `country`, `mobilePhone`, `firstName`, `lastName`
-  * *Nota: Si no se proporciona `DisplayName` pero sí `firstName` y `lastName`, el script lo construirá automáticamente.*
-
-#### `sc-Crear-AppRegistrations-Masivo.ps1`
-
-Crea masivamente App Registrations en Entra ID a partir de un archivo CSV. Configura automáticamente las Redirect URIs, Logout URL, Flujos de ID Token y asigna propietarios. Genera un reporte final con URLs directas de administración.
-*(Auth: Certificado)*
-
-**Estructura del CSV Requerido:**
-El archivo debe contener exactamente las siguientes columnas (encabezados):
-`AppName,RedirectURL,LogOutURL,idTokenRequired,owner`
+Audita qué políticas de Acceso Condicional incluyen o excluyen grupos específicos, a partir de una lista de Object IDs.
 
 #### `sc-Agregar-OwnerGrupos.ps1`
-
-Automatización para asignar un Owner (Usuario o Service Principal) a una lista masiva de grupos desde un archivo Excel.
-*(Auth: Certificado)*
-
-#### `sc-Asignar-PermisosGraph-ManagedIdentity.ps1`
-
-Script para asignar permisos de Graph API (App Roles) a una Managed Identity de Azure de forma programática.
-*(Auth: Certificado)*
-
-#### `sc-Crear-Certificado-PowerShell.ps1`
-
-Utilidad para generar y exportar certificados autofirmados para autenticación.
+Asigna masivamente un usuario o Service Principal como Owner de una lista de grupos desde un archivo Excel. Prioriza búsqueda por Object ID con fallback por DisplayName.
 
 #### `sc-Gestionar-MembresiaGrupos-Masivo.ps1`
+Gestiona el ciclo de vida de membresía (agregar/retirar) para múltiples usuarios y grupos desde un CSV. Identifica el grupo por ID o por nombre.
 
-Gestiona el ciclo de vida de la membresía de usuarios en grupos (agregar o retirar) de forma masiva procesando un archivo CSV. El script es capaz de identificar el grupo objetivo por su ID (prioritario) o por su nombre exacto.
-*(Auth: Certificado)*
+**Columnas del CSV:** `upn`, `groupName`, `groupId`, `action` (`agregar` / `retirar`)
 
-**Estructura del CSV Requerido:**
-El archivo debe contener las siguientes columnas (el orden no es estricto, pero los nombres de encabezado sí):
-`upn,groupName,groupId,action`
+#### `sc-Renombrar-GruposSeguridad.ps1`
+Renombra masivamente grupos de seguridad desde un CSV. Prioriza búsqueda por Object ID; fallback por DisplayName exacto. Detecta grupos que ya tienen el nombre correcto para evitar llamadas innecesarias a la API.
 
-  * **upn**: El User Principal Name del usuario.
-  * **action**: Debe ser `agregar` o `retirar`.
-  * **groupId** / **groupName**: Se debe llenar al menos uno. El script prioriza `groupId`; si está vacío, buscará por `groupName`.
+**Columnas del CSV:** `nombreActual`, `groupId`, `nombreNuevo`
+
+---
+
+### 👤 Usuarios-Licencias/
+
+#### `sc-Crear-Usuarios-Masivo.ps1`
+Crea usuarios en Entra ID desde un CSV con contraseñas aleatorias seguras. Soporta campos opcionales como `jobTitle`, `department`, `country`, `mobilePhone`. Genera un reporte con las credenciales creadas.
+
+**Columnas obligatorias:** `upn`, `DisplayName`  
+**Columnas opcionales:** `jobTitle`, `department`, `country`, `mobilePhone`, `firstName`, `lastName`
+
+---
+
+### 🔑 Apps-ServicePrincipals/
+
+#### `sc-Crear-AppRegistrations-Masivo.ps1`
+Crea App Registrations masivamente desde un CSV. Configura Redirect URIs, Logout URL, ID Token y propietarios. Genera un reporte con URLs directas de administración en Entra.
+
+**Columnas del CSV:** `AppName`, `RedirectURL`, `LogOutURL`, `idTokenRequired`, `owner`
+
+#### `sc-Asignar-PermisosGraph-ManagedIdentity.ps1`
+Asigna permisos de Graph API (App Roles) a una Managed Identity de Azure de forma programática, sin necesidad de hacerlo desde el portal.
+
+---
+
+### 📱 Intune/
+
+#### `sc-Renombrar-PoliticasIntune-Masivo.ps1`
+Renombra masivamente políticas de Intune de múltiples tipos (Device Configuration, Settings Catalog, Compliance, Endpoint Security, Scripts, Update Rings, Administrative Templates) desde un CSV. Usa la API beta donde es necesario para cubrir todos los tipos de perfil.
+
+**Columnas del CSV:** `Nombre actual`, `Nombre sugerido`
+
+---
+
+### 🗂️ Migracion-SharePoint-AzFiles/
+
+Herramienta independiente para migrar bibliotecas de documentos de SharePoint Online a Azure Files.
+
+Ver [`Migracion-SharePoint-AzFiles/README.md`](./Migracion-SharePoint-AzFiles/README.md) para documentación completa.
+
+| Archivo | Descripción |
+|---------|-------------|
+| `sc-Migrar-SharePoint2AzFiles.ps1` | Script principal de migración con checkpoint y resume |
+| `example.configMigracion.json` | Plantilla de configuración para la migración |
+
+---
+
+### 🛠️ Utils/
+
+#### `sc-Crear-Certificado-PowerShell.ps1`
+Genera y exporta un certificado autofirmado (`.cer` + `.pfx`) para autenticación con Microsoft Graph. Lee el `dnsName` desde `config.json`.
+
+---
 
 ## 👤 Autor
 
 **Juan Sánchez**
 
+---
+
 ## ⚠️ Descargo de Responsabilidad
 
-Estos scripts se proporcionan "tal cual", sin garantía de ningún tipo. Úselos bajo su propio riesgo. Se recomienda encarecidamente revisar el código y probarlo en un entorno de desarrollo antes de ejecutarlo en producción.
+Estos scripts se proporcionan "tal cual", sin garantía de ningún tipo. Se recomienda revisarlos y probarlos en un entorno de desarrollo antes de ejecutarlos en producción.
+````
+
+---
+
+Para reemplazar el archivo en tu repo, desde la raíz ejecuta:
+
+```bash
+# Sobrescribe el README con el contenido actualizado
+# (pega el contenido en tu editor y guarda, o usa el comando siguiente si tienes el archivo listo)
+git add README.md
+git commit -m "docs: actualizar README con nueva estructura de carpetas y ajuste de rutas"
+git push
+```
+
+Los cambios principales respecto al README anterior son: la sección de estructura visual del repositorio es ahora lo primero que se ve, los scripts están agrupados bajo sus carpetas con un encabezado por cada una, la tabla de permisos fue simplificada para eliminar la columna de API (todos usan Microsoft Graph), la sección de configuración ahora refleja la ruta correcta hacia `config.json` desde subcarpetas, y `Migracion-SharePoint-AzFiles` tiene su propio bloque con referencia a su README interno en lugar de duplicar la documentación.
