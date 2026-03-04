@@ -10,11 +10,8 @@ Script de PowerShell para migrar bibliotecas de documentos desde **SharePoint On
 📁 Repositorio
 ├── Migracion-SharePoint-AzureFiles.ps1   # Script principal
 ├── example.configMigracion.json          # Plantilla de configuración
-├── .gitignore                            # Excluye configMigracion.json y archivos de runtime
 └── README.md                            # Este archivo
 ```
-
-> **Nota de seguridad:** El archivo `configMigracion.json` con las credenciales reales está excluido del repositorio mediante `.gitignore`. Nunca lo suba al control de versiones.
 
 ---
 
