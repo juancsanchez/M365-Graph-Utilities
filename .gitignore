@@ -16,3 +16,7 @@ config*.json
 *.csv
 *.xlsx
 .DS_Store
+
+# Archivos generados en runtime
+migration_checkpoint.json
+migration_log.txt

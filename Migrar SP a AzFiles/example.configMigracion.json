@@ -1,0 +1,23 @@
+{
+    "_comentarios": {
+        "uso": "Copie este archivo, renómbrelo a configMigracion.json y reemplace todos los valores de ejemplo con los datos reales del proyecto.",
+        "git": "Asegúrese de que configMigracion.json esté en el .gitignore para no exponer credenciales reales.",
+        "SiteUrl": "URL completa del sitio de SharePoint origen. Formato: https://<tenant>.sharepoint.com/sites/<NombreSitio>",
+        "ClientId": "Application (Client) ID del App Registration creado en Entra ID. Formato: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+        "LocalStagingDrive": "Ruta local donde se descargarán temporalmente los archivos antes de subir a Azure. Debe tener suficiente espacio libre.",
+        "AzCopyPath": "Ruta completa al ejecutable azcopy.exe. Descárguelo en https://aka.ms/downloadazcopy-v10-windows",
+        "AzureFileShareBaseUrl": "URL base del Azure File Share SIN token SAS y SIN barra final. Formato: https://<cuenta>.file.core.windows.net/<share>",
+        "AzureSASToken": "Token SAS del File Share. Solo la parte que empieza en sv=... sin el signo ? inicial. Genérelo en Azure Portal > Storage Account > Shared Access Signature.",
+        "TargetFolders": "Lista de carpetas a migrar. Use la ruta relativa interna de SharePoint (puede diferir del nombre visible en el navegador). Tip: verifique la URL real navegando a la carpeta en SharePoint."
+    },
+    "SiteUrl": "https://<tenant>.sharepoint.com/sites/<NombreSitio>",
+    "ClientId": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+    "LocalStagingDrive": "C:\\Staging",
+    "AzCopyPath": "C:\\AzCopy\\azcopy.exe",
+    "AzureFileShareBaseUrl": "https://<cuenta>.file.core.windows.net/<nombre-share>",
+    "AzureSASToken": "sv=YYYY-MM-DD&ss=f&srt=sco&sp=rwdlc&se=YYYY-MM-DDTHH:MM:SSZ&st=YYYY-MM-DDTHH:MM:SSZ&spr=https&sig=<firma-generada-por-azure>",
+    "TargetFolders": [
+        "Documentos compartidos/<CarpetaRaiz1>",
+        "Documentos compartidos/<CarpetaRaiz2>"
+    ]
+}
