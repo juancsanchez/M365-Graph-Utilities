@@ -27,7 +27,7 @@
 
 try {
     # Define la ruta del archivo de configuración
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "config.json"
+    $configFile = Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath "config.json"
 
     if (-not (Test-Path $configFile)) {
         throw "Error: No se encontró el archivo de configuración 'config.json' en la ruta '$PSScriptRoot'."

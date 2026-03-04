@@ -39,7 +39,7 @@ if (-not (Get-Module -ListAvailable -Name Microsoft.Graph)) {
 }
 
 # Cargar configuración desde el archivo JSON
-$configFilePath = Join-Path -Path $PSScriptRoot -ChildPath "config.json"
+$configFilePath = Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath "config.json"
 if (-not (Test-Path $configFilePath)) {
     Write-Error "No se encontró el archivo de configuración 'config.json' en la ruta: $configFilePath"
     return

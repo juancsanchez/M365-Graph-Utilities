@@ -22,7 +22,7 @@
 # --- PASO 1: CARGA DE CONFIGURACIÓN ---
 # Se intenta leer el archivo 'config.json' ubicado en la misma carpeta que este script.
 # Este archivo debe contener 'dnsName' (para el certificado) y 'tenant' (para nombrar los archivos de salida).
-$configFilePath = Join-Path -Path $PSScriptRoot -ChildPath "config.json"
+$configFilePath = Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath "config.json"
 
 if (-not (Test-Path $configFilePath)) {
     Write-Error "El archivo de configuración '$configFilePath' no fue encontrado."

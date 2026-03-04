@@ -54,7 +54,7 @@ foreach ($moduleName in $requiredModules) {
 
 # --- PARÁMETROS DE CONEXIÓN DESATENDIDA ---
 # Los parámetros se cargan desde un archivo de configuración JSON externo.
-$configFilePath = Join-Path -Path $PSScriptRoot -ChildPath "config.json"
+$configFilePath = Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath "config.json"
 
 if (-not (Test-Path $configFilePath)) {
     Write-Error "El archivo de configuración '$configFilePath' no fue encontrado."

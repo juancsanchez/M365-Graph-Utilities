@@ -24,7 +24,7 @@
 #>
 
 # --- BLOQUE DE CONEXIÓN Y CONFIGURACIÓN ---
-$configFilePath = Join-Path -Path $PSScriptRoot -ChildPath "config.json"
+$configFilePath = Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath "config.json"
 if (-not (Test-Path $configFilePath)) {
     Write-Error "Archivo de configuración 'config.json' no encontrado en: $configFilePath"
     return
