@@ -67,18 +67,18 @@ catch {
 
 # ─────────────────────────────────────────────
 # 3. OBTENER DISPOSITIVOS NO CONFORMES
-#    Filtro OData: complianceState ne 'compliant'
-#    Excluye 'unknown' si sólo quieres fallos
-#    confirmados; cámbialo a:
-#      complianceState eq 'noncompliant'
-#    si sólo quieres los marcados como
-#    noncompliant (no los 'inGracePeriod', etc.)
+#    Filtro OData: complianceState eq 'noncompliant'
+#    Nota: el operador 'ne' no es compatible con la
+#    Graph API para complianceState y es ignorado,
+#    devolviendo todos los dispositivos.
+#    Se usa 'eq noncompliant' para obtener únicamente
+#    los dispositivos marcados como no conformes.
 # ─────────────────────────────────────────────
 Write-Host "Obteniendo dispositivos no conformes desde Intune..." -ForegroundColor Cyan
 
 $nonCompliantDevices = [System.Collections.Generic.List[object]]::new()
 $devicesUri = "https://graph.microsoft.com/v1.0/deviceManagement/managedDevices" +
-"?`$filter=complianceState ne 'compliant'" +
+"?`$filter=complianceState eq 'noncompliant'" +
 "&`$select=id,deviceName,userPrincipalName,operatingSystem,complianceState,osVersion,lastSyncDateTime"
 
 while ($devicesUri) {
@@ -152,9 +152,9 @@ foreach ($device in $nonCompliantDevices) {
                     $foundSettings = $false
                     foreach ($setting in $settingStates) {
                         if ($setting.state -ne "compliant" -and $setting.state -ne "notApplicable") {
-                            # settingName puede contener la clase de configuración completa;
+                            # settingName o setting pueden contener la clase de configuración completa;
                             # tomamos sólo la última parte después del último punto para legibilidad
-                            $rawSettingName = $setting.settingName
+                            $rawSettingName = if (-not [string]::IsNullOrEmpty($setting.settingName)) { $setting.settingName } elseif (-not [string]::IsNullOrEmpty($setting.setting)) { $setting.setting } else { "Unknown" }
                             $shortSetting = if ($rawSettingName -match '\.([^.]+)$') { $Matches[1] } else { $rawSettingName }
                             
                             $reasons.Add("$policyDisplayName/$shortSetting")
@@ -184,7 +184,9 @@ foreach ($device in $nonCompliantDevices) {
         $reasons.Add("[$compState - sin detalles de política disponibles]")
     }
 
-    $reasonsJoined = $reasons -join " | "
+    # Eliminar duplicados para una salida más limpia
+    $uniqueReasons = $reasons | Select-Object -Unique
+    $reasonsJoined = $uniqueReasons -join " | "
 
     # --- CSV record ---
     $reportData.Add([PSCustomObject]@{
@@ -205,7 +207,7 @@ Nombre Dispotivo: $deviceName
 SO              : $os
 Estado          : $compState
 Razones de no cumplimiento:
-$(($reasons | ForEach-Object { "  $_" }) -join "`n")
+$(($uniqueReasons | ForEach-Object { "  $_" }) -join "`n")
 "@
     $reportLines.Add($block)
 }
