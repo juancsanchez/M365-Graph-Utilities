@@ -17,7 +17,7 @@ Colección de scripts de PowerShell para automatizar tareas de administración, 
 ├── 📁 Usuarios-Licencias/          # Creación y gestión de cuentas de usuario
 ├── 📁 Apps-ServicePrincipals/      # App Registrations y Managed Identities
 ├── 📁 Intune/                      # Gestión de políticas de dispositivos
-├── 📁 Migracion-SharePoint-AzFiles/ # Migración de SharePoint Online a Azure Files
+├── 📁 Migrar-SP-AzFiles/           # Migración de SharePoint Online a Azure Files
 ├── 📁 Utils/                       # Herramientas de soporte (certificados, etc.)
 ├── example.config.json             # Plantilla de configuración
 ├── .gitignore
@@ -123,6 +123,7 @@ Todos los scripts usan permisos de tipo **Application** que deben ser consentido
 | `sc-Investigar-SignIn-CorrelationId` | `AuditLog.Read.All`, `Directory.Read.All` |
 | `sc-Encontrar-AlcanceGruposCA` | `Policy.Read.All`, `Group.Read.All` |
 | `sc-Renombrar-PoliticasIntune-Masivo` | `DeviceManagementConfiguration.ReadWrite.All` |
+| `sc-Generar-ReporteDispositivosNoCumplimiento` | `DeviceManagementManagedDevices.Read.All`, `DeviceManagementConfiguration.Read.All` |
 
 ---
 
@@ -212,6 +213,9 @@ Asigna permisos de Graph API (App Roles) a una Managed Identity de Azure de form
 
 ### 📱 Intune/
 
+#### `sc-Generar-ReporteDispositivosNoCumplimiento.ps1`
+Genera un reporte detallado de dispositivos no conformes en Intune con sus razones específicas de incumplimiento. Consulta los estados por política y por configuración de ajuste, emitiendo una salida en CSV para análisis y en TXT para lectura rápida.
+
 #### `sc-Renombrar-PoliticasIntune-Masivo.ps1`
 Renombra masivamente políticas de Intune de múltiples tipos (Device Configuration, Settings Catalog, Compliance, Endpoint Security, Scripts, Update Rings, Administrative Templates) desde un CSV. Usa la API beta donde es necesario para cubrir todos los tipos de perfil.
 
@@ -219,7 +223,7 @@ Renombra masivamente políticas de Intune de múltiples tipos (Device Configurat
 
 ---
 
-### 🗂️ Migracion-SharePoint-AzFiles/
+### 🗂️ Migrar-SP-AzFiles/
 
 Herramienta independiente para migrar bibliotecas de documentos de SharePoint Online a Azure Files.
 
@@ -248,18 +252,3 @@ Genera y exporta un certificado autofirmado (`.cer` + `.pfx`) para autenticació
 ## ⚠️ Descargo de Responsabilidad
 
 Estos scripts se proporcionan "tal cual", sin garantía de ningún tipo. Se recomienda revisarlos y probarlos en un entorno de desarrollo antes de ejecutarlos en producción.
-````
-
----
-
-Para reemplazar el archivo en tu repo, desde la raíz ejecuta:
-
-```bash
-# Sobrescribe el README con el contenido actualizado
-# (pega el contenido en tu editor y guarda, o usa el comando siguiente si tienes el archivo listo)
-git add README.md
-git commit -m "docs: actualizar README con nueva estructura de carpetas y ajuste de rutas"
-git push
-```
-
-Los cambios principales respecto al README anterior son: la sección de estructura visual del repositorio es ahora lo primero que se ve, los scripts están agrupados bajo sus carpetas con un encabezado por cada una, la tabla de permisos fue simplificada para eliminar la columna de API (todos usan Microsoft Graph), la sección de configuración ahora refleja la ruta correcta hacia `config.json` desde subcarpetas, y `Migracion-SharePoint-AzFiles` tiene su propio bloque con referencia a su README interno en lugar de duplicar la documentación.
