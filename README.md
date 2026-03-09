@@ -124,6 +124,7 @@ Todos los scripts usan permisos de tipo **Application** que deben ser consentido
 | `sc-Encontrar-AlcanceGruposCA` | `Policy.Read.All`, `Group.Read.All` |
 | `sc-Renombrar-PoliticasIntune-Masivo` | `DeviceManagementConfiguration.ReadWrite.All` |
 | `sc-Generar-ReporteDispositivosNoCumplimiento` | `DeviceManagementManagedDevices.Read.All`, `DeviceManagementConfiguration.Read.All` |
+| `sc-Generar-ReporteRecursosExchange` | `Exchange.ManageAsApp` + rol `View-Only Recipients` en Exchange Online |
 
 ---
 
@@ -161,6 +162,11 @@ Recuento rápido de usuarios licenciados en tenants muy grandes. Usa `ForEach-Ob
 
 #### `sc-Investigar-SignIn-CorrelationId.ps1`
 Diagnóstico de un intento de inicio de sesión fallido a partir de su Correlation ID. Muestra detalles del usuario, dispositivo, código de error y análisis de qué políticas de Acceso Condicional causaron el bloqueo.
+
+#### `sc-Generar-ReporteRecursosExchange.ps1`
+Inventario completo de buzones de recurso del tenant: salas de reuniones y equipos. Por cada recurso extrae la configuración de calendario (AutomateProcessing, AllowConflicts, duración máxima), capacidad de la sala, delegados con FullAccess y SendAs, tamaño del buzón, fecha de último uso y estado habilitado/deshabilitado. Requiere conexión a Exchange Online con autenticación desatendida mediante certificado.
+
+> ⚙️ **Configuración previa requerida:** Exchange Online mantiene su propio registro de Service Principals, independiente de Entra ID. Antes de ejecutar este script por primera vez es necesario registrar el SP en Exchange y asignarle el rol `View-Only Recipients` mediante `New-ServicePrincipal` y `New-ManagementRoleAssignment`. El procedimiento completo con los comandos exactos se encuentra documentado en el bloque `.NOTES` del script.
 
 ---
 
