@@ -124,6 +124,7 @@ Todos los scripts usan permisos de tipo **Application** que deben ser consentido
 | `sc-Encontrar-AlcanceGruposCA` | `Policy.Read.All`, `Group.Read.All` |
 | `sc-Renombrar-PoliticasIntune-Masivo` | `DeviceManagementConfiguration.ReadWrite.All` |
 | `sc-Generar-ReporteDispositivosNoCumplimiento` | `DeviceManagementManagedDevices.Read.All`, `DeviceManagementConfiguration.Read.All` |
+| `sc-Generar-ReporteInventarioDispositivos` | `DeviceManagementManagedDevices.Read.All` |
 | `sc-Generar-ReporteRecursosExchange` | `Exchange.ManageAsApp` + rol `View-Only Recipients` en Exchange Online |
 
 ---
@@ -221,6 +222,9 @@ Asigna permisos de Graph API (App Roles) a una Managed Identity de Azure de form
 
 #### `sc-Generar-ReporteDispositivosNoCumplimiento.ps1`
 Genera un reporte detallado de dispositivos no conformes en Intune con sus razones específicas de incumplimiento. Consulta los estados por política y por configuración de ajuste, emitiendo una salida en CSV para análisis y en TXT para lectura rápida.
+
+#### `sc-Generar-ReporteInventarioDispositivos.ps1`
+Inventario completo de todos los dispositivos administrados en Intune, optimizado para tenants de alto volumen. Extrae nombre del dispositivo, ID, UPN del usuario principal, marca, modelo, estado de cumplimiento, fecha de último check-in, sistema operativo y versión, tipo de propiedad (Corporate/Personal) y número de serie. Implementa paginación robusta (`$top=999`), retry con exponential backoff para manejar throttling en endpoints de Intune (que frecuentemente omiten el header `Retry-After`), `$select` explícito para propiedades non-default y escritura progresiva al CSV para evitar consumo excesivo de RAM. En PowerShell 7+ activa procesamiento paralelo con `ForEach-Object -Parallel`; en 5.1 degrada automáticamente a modo secuencial.
 
 #### `sc-Renombrar-PoliticasIntune-Masivo.ps1`
 Renombra masivamente políticas de Intune de múltiples tipos (Device Configuration, Settings Catalog, Compliance, Endpoint Security, Scripts, Update Rings, Administrative Templates) desde un CSV. Usa la API beta donde es necesario para cubrir todos los tipos de perfil.
