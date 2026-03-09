@@ -83,6 +83,8 @@ try {
     Connect-MgGraph -TenantId $TenantId -AppId $ClientId -CertificateThumbprint $certThumbprint
     Write-Host "Conexión a Microsoft Graph exitosa." -ForegroundColor Green
 
+    # NOTA: El parámetro -CertificateThumbprint solo es compatible con Microsoft Windows.
+    # Fuente: https://learn.microsoft.com/en-us/powershell/exchange/connect-to-exchange-online-powershell?view=exchange-ps#connect-to-run-unattended-scripts
     Write-Host "Conectando a Exchange Online con certificado..." -ForegroundColor Cyan
     Connect-ExchangeOnline -AppId $clientId -CertificateThumbPrint $certThumbprint -Organization $organizationName
     Write-Host "Conexión a Exchange Online exitosa." -ForegroundColor Green

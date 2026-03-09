@@ -104,6 +104,8 @@ catch {
 }
 
 # Conexión a Exchange Online
+# NOTA: El parámetro -CertificateThumbprint solo es compatible con Microsoft Windows.
+# Fuente: https://learn.microsoft.com/en-us/powershell/exchange/connect-to-exchange-online-powershell?view=exchange-ps#connect-to-run-unattended-scripts
 try {
     Write-Host "Conectando a Exchange Online con certificado..." -ForegroundColor Cyan
     Connect-ExchangeOnline -AppId $clientId -CertificateThumbprint $certThumbprint -Organization $organizationName -ShowBanner:$false
