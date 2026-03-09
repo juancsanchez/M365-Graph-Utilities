@@ -149,9 +149,7 @@ Write-Host "Obteniendo buzones de recursos (salas y equipos)..." -ForegroundColo
 
 try {
     # Recuperar todos los buzones de recurso del tenant en una sola llamada
-    $resourceMailboxes = Get-Mailbox -RecipientTypeDetails RoomMailbox, EquipmentMailbox -ResultSize Unlimited `
-        -Properties DisplayName, Alias, UserPrincipalName, PrimarySmtpAddress, RecipientTypeDetails,
-    ResourceCapacity, AccountDisabled, WhenMailboxCreated
+    $resourceMailboxes = Get-Mailbox -RecipientTypeDetails RoomMailbox, EquipmentMailbox -ResultSize Unlimited
 }
 catch {
     Write-Error "No se pudo obtener la lista de recursos. Verifique los permisos del Service Principal."
