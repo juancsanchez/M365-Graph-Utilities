@@ -120,6 +120,8 @@ Todos los scripts usan permisos de tipo **Application** que deben ser consentido
 | `sc-Asignar-PermisosGraph-ManagedIdentity` | `AppRoleAssignment.ReadWrite.All` |
 | `sc-Crear-AppRegistrations-Masivo` | `Application.ReadWrite.All`, `User.Read.All`, `Directory.Read.All` |
 | `sc-Crear-Usuarios-Masivo` | `User.ReadWrite.All` |
+| `sc-Eliminar-Usuarios-Masivo` | `User.ReadWrite.All` |
+| `sc-Deshabilitar-Usuarios-Masivo` | `User.ReadWrite.All` |
 | `sc-Investigar-SignIn-CorrelationId` | `AuditLog.Read.All`, `Directory.Read.All` |
 | `sc-Encontrar-AlcanceGruposCA` | `Policy.Read.All`, `Group.Read.All` |
 | `sc-Renombrar-PoliticasIntune-Masivo` | `DeviceManagementConfiguration.ReadWrite.All` |
@@ -203,6 +205,18 @@ Crea usuarios en Entra ID desde un CSV con contraseñas aleatorias seguras. Sopo
 
 **Columnas obligatorias:** `upn`, `DisplayName`  
 **Columnas opcionales:** `jobTitle`, `department`, `country`, `mobilePhone`, `firstName`, `lastName`
+
+#### `sc-Eliminar-Usuarios-Masivo.ps1`
+Elimina masivamente usuarios de Entra ID desde un CSV. Opera en dos fases: primero resuelve y muestra todos los usuarios encontrados (por `objectId` con fallback a `upn`), luego solicita confirmación explícita escribiendo `CONFIRMAR` antes de proceder. Genera un reporte CSV con el resultado de cada operación (exitosos, errores y filas omitidas).
+
+**Columnas del CSV:** `upn`, `objectId` (al menos una de las dos por fila)  
+> ⚠️ Los usuarios eliminados quedan en la papelera de reciclaje de Entra ID y son recuperables durante 30 días.
+
+#### `sc-Deshabilitar-Usuarios-Masivo.ps1`
+Deshabilita masivamente cuentas de usuario de Entra ID desde un CSV. Opera en dos fases: primero resuelve y muestra todos los usuarios encontrados (por `objectId` con fallback a `upn`) indicando cuáles ya están deshabilitados, luego solicita confirmación explícita escribiendo `CONFIRMAR`. Las cuentas ya deshabilitadas se omiten automáticamente. Genera un reporte CSV con el resultado.
+
+**Columnas del CSV:** `upn`, `objectId` (al menos una de las dos por fila)  
+> ✅ Esta acción es **reversible**. Las cuentas pueden volver a habilitarse desde el portal de Entra ID.
 
 ---
 
